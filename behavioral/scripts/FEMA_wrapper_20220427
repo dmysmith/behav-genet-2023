@@ -1,0 +1,64 @@
+
+
+%% Run FEMA for random effects project
+%% Diana Smith
+%% April 2022
+
+% ADD CMIG tools directory to MATLAB path:
+addpath(genpath('/home/d9smith/github/cmig_tools'))
+
+% Specify data release
+dataRelease = '4.0';
+
+% Path to store results
+outDir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral'
+
+% Inputs to FEMA_wrapper.m
+atlasVersion = 'ABCD2_cor10';
+dirname_tabulated = fullfile('/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/tabulated/released/'); %KNOWN ISSUE: breaks when using txt files following NDA release --> must use pre-release csv files
+%To run multiple deisgn matrices with same imaging data populate each row with path to each design matrix
+designmat_dir = '/home/d9smith/projects/random_effects/behavioral';
+designmat_file = dir(sprintf('%s/designMat*.txt', designmat_dir));
+designmat_file = {designmat_file.name}';
+fname_design = strcat(designmat_dir, '/', designmat_file);
+% fname_pihat = fullfile(abcd_sync_path, '3.0','genomics','ABCD_rel3.0_pihat.mat'); %FIXME: replace with 4.0 when available
+fname_pihat = fullfile('/space/amdale/1/tmp/ABCD_cache/abcd-sync/3.0/genomics/ABCD_rel3.0_pihat.mat');
+
+% Optional inputs for `FEMA_wrapper.m` depending on analysis
+contrasts=[]; % Contrasts relate to columns in design matrix e.g. [1 -1] will take the difference between cols 1 and 2 in your design matrix (X)
+ranknorm = 0; % Rank normalizes dependent variables (Y) (default = 0)
+nperms = 1000; % Number of permutations - if wanting to use resampling methods nperms>0 and load Anders' script for FEMA_fit
+mediation = 0; % If wanting to use outputs for a mediation analysis set mediation=1 - ensures same resampling scheme used for each model in fname_design
+PermType = 'wildbootstrap'; %Default resampling method is null wild-bootstrap - to run mediation analysis need to use non-null wild-bootstrap ('wildboostrap-nn')
+tfce = 0; % Columns in design matrix to loop over to calculate TFCE - selecting columns of interest improves efficiency - is `isempty(tfce_cols)` FEMA_wrapper will NOT run TFCE
+
+datatype='external'; % can use txt with columns of ANY data type (e.g. ROIs, behavior) - runs mass univaraite LME across every column
+
+% if nperms > 0 will need to add Anders' script
+if nperms > 0
+    addpath(genpath('~dale/matlab/SSE_local'));
+    outDir = sprintf('%s/%.0fperms', outDir, nperms);
+end
+
+%% loop through each design matrix
+for i = 1:numel(fname_design)
+   disp('entering first for loop');
+   disp(fname_design(i));
+   %% loop through each set of random effects
+   for j = 1:numel(random_effects)
+
+   
+   end
+    %% for each set of random effects will need to specify: 
+        % fstem_imaging
+        % dirname_imaging
+        % out_path
+        % dirname_out
+        % RandomEffects
+
+        % then run FEMA
+end
+
+
+
+figure; plot(squeeze(sig2mat_perm(2,8,2:11)), squeeze(sig2mat_perm(3,8,2:11)),'*');
