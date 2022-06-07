@@ -11,6 +11,17 @@ IID2 = A.textdata(2:end,4);
 PI_HAT = A.textdata(2:end,10);
 
 % try making figures 
-figure(1); imagesc(GRM,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('Genetic Relatedness Matrix in ABCD');
-figure(2); hist(colvec(GRM),linspace(-0.5,1.5,201)); xlim([-0.3 1.1]);ylim([0 5000])
+figure(1); 
+imagesc(PI_HAT,0.5*[-1 1]); 
+colormap(blueblackred); 
+axis equal tight; 
+colorbar; 
+xlabel('Subject #'); 
+ylabel('Subject #'); 
+title('Pihat Matrix in ABCD');
+saveas(gcf,'/home/d9smith/tmp/figure1.png');
+
+
+
+% figure(2); hist(colvec(GRM),linspace(-0.5,1.5,201)); xlim([-0.3 1.1]);ylim([0 5000])
 
