@@ -44,27 +44,29 @@ end
 
 pihatmat_new(~isfinite(pihatmat_new)) = 0;
 
+% add path for colormap
+addpath(genpath('/home/d9smith/github/cmig_tools/cmig_tools_utils/matlab'));
+
 % old pihat matrix
 addpath(genpath('/home/d9smith/.matlab'));
-figure(6); imagesc(pihatmat,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('Pihat Matrix in ABCD');
+figure('visible','off'); imagesc(pihatmat,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('Pihat Matrix in ABCD');
 export_fig(gcf, '/home/d9smith/tmp/old_pihats.png');
 
 % new pihat matrix
-figure(7); imagesc(pihatmat_new,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('New Pihat Matrix in ABCD');
+figure('visible','off'); imagesc(pihatmat_new,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('New Pihat Matrix in ABCD');
 export_fig(gcf, '/home/d9smith/tmp/new_pihats.png');
 
-% try making figures 
-figure(23); hold on;
-imagesc(PI_HAT,0.5*[-1 1]); 
-colormap(blueblackred); 
-axis equal tight;
-xlabel('Subject #'); 
-ylabel('Subject #'); 
-title('Pihat Matrix in ABCD'); hold off;
-saveas(gcf,'/home/d9smith/tmp/figure1.png');
-
-
-
+% old code for trying to make figures
+if 0
+    figure(23); hold on;
+    imagesc(PI_HAT,0.5*[-1 1]); 
+    colormap(blueblackred); 
+    axis equal tight;
+    xlabel('Subject #'); 
+    ylabel('Subject #'); 
+    title('Pihat Matrix in ABCD'); hold off;
+    saveas(gcf,'/home/d9smith/tmp/figure1.png');
+end
 
 % figure(2); hist(colvec(GRM),linspace(-0.5,1.5,201)); xlim([-0.3 1.1]);ylim([0 5000])
 
