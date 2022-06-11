@@ -4,6 +4,8 @@
 addpath(genpath('/home/d9smith/github/cmig_tools/cmig_tools_utils/matlab'));
 addpath(genpath('/home/d9smith/.matlab'));
 
+generate_hist=0;
+
 filename = '/space/gwas-syn2/1/data/GWAS/ABCD/genotype/release5.0/genotype_QCed/ABCD_20220428.updated.nodups.curated.rel_check.genome';
 delimiterIn = ' ';
 headerlinesIn = 1;
@@ -24,17 +26,20 @@ pihatmat(~isfinite(pihatmat)) = 0;
 % table of new pihat values 
 tmp = table(IID1, IID2, PI_HAT); 
 
-% histogram of pihat values
-figure('visible','off');clf; 
-histogram(tmp.PI_HAT, 300);
-% ylim([0 2000]);
-export_fig(gcf, '/home/d9smith/tmp/hist_new_pihats.png');
+if generate_hist ==1
+    % histogram of pihat values
+    figure('visible','off');clf; 
+    histogram(tmp.PI_HAT, 300);
+    % ylim([0 2000]);
+    export_fig(gcf, '/home/d9smith/tmp/hist_new_pihats.png');
 
-% log scale
-figure('visible','off');clf; 
-histogram(tmp.PI_HAT, 1000);
-set(gca,'YScale','log');
-export_fig(gcf, '/home/d9smith/tmp/hist_new_pihats_logscale.png');
+    % log scale
+    figure('visible','off');clf; 
+    histogram(tmp.PI_HAT, 1000);
+    set(gca,'YScale','log');
+    export_fig(gcf, '/home/d9smith/tmp/hist_new_pihats_logscale.png');
+end
+
 
 % populate pihatmat_new with values from tmp.PI_HAT 
 pihatmat_new = nan(length(iid_list), length(iid_list));
@@ -50,44 +55,47 @@ for i = 1:length(iid_list)
     pihatmat_new(i,i) = 1;
 end
 
+% save new pihat estimate
+outdir = '/space/syn50/1/data/ABCD/d9smith/grm_files';
+outfile = matfile(sprintf('%s/%s',outdir,'pihat_20220611.mat'));
+outfile.pihatmat = pihatmat_new;
+
 % change all NAs to 0 - is this right?
 pihatmat_new(~isfinite(pihatmat_new)) = 0;
 
-% plot old pihat matrix
-figure('visible','off');clf; imagesc(pihatmat,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('Pihat Matrix in ABCD');
-export_fig(gcf, '/home/d9smith/tmp/old_pihats.png');
+if generate_hist == 1
+    % plot old pihat matrix
+    figure('visible','off');clf; imagesc(pihatmat,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('Pihat Matrix in ABCD');
+    export_fig(gcf, '/home/d9smith/tmp/old_pihats.png');
 
-% plot new pihat matrix
-figure('visible','off'); clf; imagesc(pihatmat_new,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('New Pihat Matrix in ABCD');
-export_fig(gcf, '/home/d9smith/tmp/new_pihats.png');
+    % plot new pihat matrix
+    figure('visible','off'); clf; imagesc(pihatmat_new,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('New Pihat Matrix in ABCD');
+    export_fig(gcf, '/home/d9smith/tmp/new_pihats.png');
 
-% what is different between old and new?
-N = 5000;
-idx1 = randperm(length(iid_list),N);
-idx2 = randperm(length(iid_list),N); 
+    % what is different between old and new?
+    N = 5000;
+    idx1 = randperm(length(iid_list),N);
+    idx2 = randperm(length(iid_list),N); 
 
-rand_pihat = [];
-for i = 1:N 
-    rand_pihat(i,1) = pihatmat(idx1(i),idx2(i));
-    rand_pihat(i,2) = pihatmat_new(idx1(i),idx2(i));
-end
-
-% plot change from old to new
-figure('visible','off');clf;
-coordLineStyle='k.';
-boxplot(rand_pihat,'Symbol',coordLineStyle); 
-hold on;
-parallelcoords(rand_pihat, 'Color', 0.7*[1 1 1],'LineStyle', '-',...
-'Marker', '.', 'MarkerSize', 10);
-title('change from old to new');
-hold off;
-export_fig(gcf, '/home/d9smith/tmp/pihat_change.png');
-
-for i = 1:N
-    if rand_pihat(i,1) > .2
-        disp(i);
+    rand_pihat = [];
+    for i = 1:N 
+        rand_pihat(i,1) = pihatmat(idx1(i),idx2(i));
+        rand_pihat(i,2) = pihatmat_new(idx1(i),idx2(i));
     end
+
+    % plot change from old to new
+    figure('visible','off');clf;
+    coordLineStyle='k.';
+    boxplot(rand_pihat,'Symbol',coordLineStyle); 
+    hold on;
+    parallelcoords(rand_pihat, 'Color', 0.7*[1 1 1],'LineStyle', '-',...
+    'Marker', '.', 'MarkerSize', 10);
+    title('change from old to new');
+    hold off;
+    export_fig(gcf, '/home/d9smith/tmp/pihat_change.png');
 end
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Diana's old code
@@ -113,5 +121,11 @@ if 0
                 pihatmat_new(j,i) = tmp.PI_HAT(is_match); % should go in both directions
             end
         end
+    end
+end
+
+for i = 1:N
+    if rand_pihat(i,1) > .2
+        disp(i);
     end
 end

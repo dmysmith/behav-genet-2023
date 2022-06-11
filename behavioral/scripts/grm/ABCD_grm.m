@@ -1,6 +1,8 @@
 % note from Diana -- need to add anders function to path
 addpath(genpath('/home/dale/matlab/MOSTest'));
 addpath(genpath('/home/dale/matlab/utils'));
+addpath(genpath('/home/d9smith/.matlab'));
+addpath(genpath('/home/d9smith/github/cmig_tools/cmig_tools_utils'));
 
 try
    canUseGPU = parallel.gpu.GPUDevice.isAvailable;
@@ -49,10 +51,17 @@ GRM = grm_sum/nsum;
 %n = 10; GRM_corr = cov2corr(GRM - U(:,1:n)*diag(s(1:n))*U(:,1:n)');
 n = 10; GRM_corr = cov2corr(GRM - U(:,1:n)*diag(s(1:n))*U(:,1:n)');
 GRM = cov2corr(GRM);
-figure(1); imagesc(GRM,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('Genetic Relatedness Matrix in ABCD');
-figure(2); hist(colvec(GRM),linspace(-0.5,1.5,201)); xlim([-0.3 1.1]);ylim([0 5000])
-figure(11); imagesc(GRM_corr,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('PCA-Corrected Genetic Relatedness Matrix in ABCD');
-figure(12); hist(colvec(GRM_corr),linspace(-0.5,1.5,201)); xlim([-0.3 1.1]);ylim([0 5000])
+figure('visible','off'); clf; imagesc(GRM,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('Genetic Relatedness Matrix in ABCD');export_fig(gcf, '/home/d9smith/tmp/grm.png');
+figure('visible','off'); clf; hist(colvec(GRM),linspace(-0.5,1.5,201)); xlim([-0.3 1.1]);ylim([0 5000]);export_fig(gcf, '/home/d9smith/tmp/fig2.png');
+figure('visible','off'); clf; imagesc(GRM_corr,0.5*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #'); title('PCA-Corrected Genetic Relatedness Matrix in ABCD');export_fig(gcf, '/home/d9smith/tmp/grm_pca.png');
+figure('visible','off'); clf; hist(colvec(GRM_corr),linspace(-0.5,1.5,201)); xlim([-0.3 1.1]);ylim([0 5000]);export_fig(gcf, '/home/d9smith/tmp/fig12.png');
+
+% save out GRM and GRM_corr
+outdir = '/space/syn50/1/data/ABCD/d9smith/grm_files';
+outfile = matfile(sprintf('%s/%s',outdir,'grm.mat'));
+outfile.GRM = GRM;
+outfile.GRM_corr = GRM_corr;
+
 
 % Use svd of z-transformed SNP dose matrix
 tic
@@ -60,7 +69,7 @@ tic
 toc
 % Look at the covariance of the first few principal components
 n = 3; tmp = U(:,1:n)*diag(s(1:n).^2)*U(:,1:n)';
-figure(666); imagesc(tmp,max(abs(tmp(:)))*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #');
+figure('visible','off'); clf; imagesc(tmp,max(abs(tmp(:)))*[-1 1]); colormap(blueblackred); axis equal tight; colorbar; xlabel('Subject #'); ylabel('Subject #');export_fig(gcf, '/home/d9smith/tmp/fig666.png');
 
 
 % Look at batch effects
