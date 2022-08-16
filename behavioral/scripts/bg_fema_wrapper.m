@@ -28,10 +28,11 @@ addpath(genpath('/home/d9smith/github/cmig_tools_internal'));
 dataRelease = '4.0';
 
 % Path to store results
-outDir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral';
+outDir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/ml_results';
 
 % specify array of random effects
-random_effects = {{'F','A','E'};{'F','A','T','E'};{'F','A','T','H','E'};{'F','A','T','S','E'};{'F','A','T','H','S','E'}};
+random_effects = {{'F','A','E'};{'F','A','T','E'};{'F','A','T','H','E'};{'F','A','T','S','E'};{'F','A','T','H','S','E'};
+{'H','A','E'};{'H','A','T','E'};{'H','A','T','S','E'}};
 
 % specify array of design 
 % fname_design = '/home/d9smith/projects/random_effects/behavioral/designMat/designMat1_allcovs.txt'; % for debugging only
@@ -58,8 +59,11 @@ nperms = 0; % Number of permutations - set to 0 for now
 mediation = 0; % If wanting to use outputs for a mediation analysis set mediation=1 - ensures same resampling scheme used for each model in fname_design
 PermType = 'wildbootstrap'; %Default resampling method is null wild-bootstrap - to run mediation analysis need to use non-null wild-bootstrap ('wildboostrap-nn')
 tfce = 0; % Columns in design matrix to loop over to calculate TFCE - selecting columns of interest improves efficiency - is `isempty(tfce_cols)` FEMA_wrapper will NOT run TFCE
+RandomEstType = 'ML'; % specify random effects estimator (default is MoM)
 
 datatype='external'; % can use txt with columns of ANY data type (e.g. ROIs, behavior) - runs mass univaraite LME across every column
+
+RandomEffects = {'H';'A';'S';'T';'E'};
 
 %% loop through each design matrix
 for i = 1:numel(designmat_array)

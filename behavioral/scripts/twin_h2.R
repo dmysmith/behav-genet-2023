@@ -42,10 +42,12 @@ twin_age2<-merge(twin_ids, ABCD_age, by.x=c("IID2"), by.y=c("src_subject_id"))
 colnames(twin_age2)[3]<-c("twin2_age")
 
 twin_age<-merge(twin_age1,twin_age2,by=c("IID1","IID2"))
-#dz_age$twin<-ifelse(dz_age$twin1_age==dz_age$twin2_age, 1,0)
-#dz_true<-unique(dz_age[dz_age$twin==1,])
+twin_age$twin<-ifelse(twin_age$twin1_age==twin_age$twin2_age, 1,0)
+twin_true<-unique(twin_age[twin_age$twin==1,])
 
 #dz_v2<-dz_true %>% inner_join(dz,by=c("IID1","IID2"))
+
+ABCD_twins<-twin_true %>% inner_join(ABCD_twins,by=c("IID1","IID2"))
 
 #separate by Mono vs dizyg
 mz<-ABCD_twins[ABCD_twins$twin1_genetic_zygosity == "Monozygotic",]
@@ -56,6 +58,7 @@ dz<-ABCD_twins[ABCD_twins$twin1_genetic_zygosity == "Dizygotic",]
 
 write.table(mz, outpath_mz, sep = "\t", quote=FALSE, row.names=FALSE)
 write.table(dz, outpath_dz, sep = "\t", quote=FALSE, row.names=FALSE)
+write.table(ABCD_twins, outpath_all, sep = "\t", quote=FALSE, row.names=FALSE)
 
 #calculate correlation for each Feature in mono vs dizygotic
 cor<- data.frame(matrix(ncol = 3, nrow = length(phenonames[-2:0])))
@@ -88,13 +91,13 @@ for (f in phenonames[-2:0]){
 }
 
 write.table(cor,outpath_h2, sep = "\t", quote=FALSE, row.names=TRUE) 
-#final sample based on 349 monozygotic twins and 584 dizygotic twin pairs
+#final sample based on 349 monozygotic twins and 491 dizygotic twin pairs
 
 #get final twin sample
 twin_IDs<-ABCD_twins[,c(1:2)]
 
 print(paste0("final sample: ", dim(mz)[1], " MZ pairs, ", dim(dz)[1], " DZ pairs"))
 
-# final sample: 355 MZ pairs, 528 DZ pairs
+# final sample: 349 MZ pairs, 491 DZ pairs
 
 write.table(twin_IDs, outpath_twinIDs, sep = "\t", quote=FALSE, row.names=FALSE) 
