@@ -31,19 +31,18 @@ dataRelease = '4.0';
 outDir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral';
 
 % specify array of random effects
-% random_effects = {{'F','A','E'};{'F','S','E'};{'F','A','S','E'};{'F','A','D','S','E'}};
-% random_effects = {{'F','A','E'}}; % just testing for now... DS 2020-08-11
-random_effects = {{'F','A','E'};{'F','A','T','E'};{'F','A','T','H','E'}};
+random_effects = {{'F','A','E'};{'F','A','T','E'};{'F','A','T','H','E'};{'F','A','T','S','E'};{'F','A','T','H','S','E'}};
 
 % specify array of design 
-fname_design = '/home/d9smith/projects/random_effects/behavioral/designMat/designMat1_allcovs.txt'; % change back later
-% designmat_dir = '/home/d9smith/projects/random_effects/behavioral';
-% designmat_file = dir(sprintf('%s/designMat*.txt', designmat_dir));
-% designmat_file = {designmat_file.name}';
-% designmat_array = strcat(designmat_dir, '/', designmat_file);
+% fname_design = '/home/d9smith/projects/random_effects/behavioral/designMat/designMat1_allcovs.txt'; % for debugging only
+designmat_dir = '/home/d9smith/projects/random_effects/behavioral/designMat';
+designmat_file = dir(sprintf('%s/designMat*.txt', designmat_dir));
+designmat_file = {designmat_file.name}';
+designmat_array = strcat(designmat_dir, '/', designmat_file);
 
 % specify imaging file (the outcome you are predicting)
-dirname_imaging = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/nih_tbx_longitudinal.txt';
+dirname_imaging_baseline = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/nih_tbx_baseline.txt';
+dirname_imaging_longitudinal = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/nih_tbx_longitudinal.txt';
 
 % Inputs to FEMA_wrapper.m
 atlasVersion = 'ABCD2_cor10';
@@ -62,13 +61,6 @@ tfce = 0; % Columns in design matrix to loop over to calculate TFCE - selecting 
 
 datatype='external'; % can use txt with columns of ANY data type (e.g. ROIs, behavior) - runs mass univaraite LME across every column
 
-% if nperms > 0 will need to add Anders' script DELETE THIS SECTION
-% if nperms > 0
-if 0
-    addpath(genpath('~dale/matlab/SSE_local'));
-    % outDir = sprintf('%s/%.0fperms', outDir, nperms);
-end
-
 %% loop through each design matrix
 for i = 1:numel(designmat_array)
    fname_design = designmat_array(i);
@@ -76,11 +68,18 @@ for i = 1:numel(designmat_array)
    for j = 1:numel(random_effects)     
         % define dynamic inputs
         fstem_imaging = sprintf('%s',random_effects{j}{:});
-        % dirname_out = strcat(outDir, '/',designmat_file{i}(1:end-4)); % when looping through design matrices
-        dirname_out = strcat(outDir, '/',fname_design(1:-4)); % when only using one design matrix
+        dirname_out = strcat(outDir, '/',designmat_file{i}(1:end-4)); % when looping through design matrices
+        % dirname_out = strcat(outDir, '/',fname_design(1:-4)); % when only using one design matrix
         disp(dirname_out);
         RandomEffects = random_effects{j};
         disp(RandomEffects);
+
+        % for models including S, we want to use the longitudinal outcome data, otherwise only baseline
+        if any(strcmp(random_effects{j},'S'))
+            dirname_imaging = dirname_imaging_longitudinal;
+        else
+            dirname_imaging = dirname_imaging_baseline;
+        end
         
         % run FEMA
         [fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm logLikvec_perm inputs] = FEMA_wrapper(fstem_imaging, fname_design, dirname_out, dirname_tabulated, dirname_imaging, datatype,...
