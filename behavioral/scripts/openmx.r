@@ -15,6 +15,7 @@ library(OpenMx)
 library(reshape)
 library(psych)
 library(Matrix)
+library(stringi)
 library('ggplot2')
 source("/home/d9smith/projects/random_effects/behavioral/scripts/miFunctions2.R")
 source("/home/d9smith/projects/random_effects/behavioral/scripts/twin_functions.R")
@@ -22,35 +23,49 @@ source("/home/d9smith/projects/random_effects/behavioral/scripts/twin_functions.
 mxOption(NULL, "Default optimizer", 'SLSQP') # TODO - what does this do?
 
 # Load Data
-nda_file = '/home/d9smith/projects/random_effects/behavioral/designMat/designMat5_agesextwinsbaseline.txt'
-mz_file = '/home/d9smith/projects/random_effects/behavioral/data/ABCD_mz_IIDs.txt'
-dz_file = '/home/d9smith/projects/random_effects/behavioral/data/ABCD_dz_IIDs.txt'
-nihtbx_file = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/nih_tbx_baseline.txt'
+twin_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/ABCD_twins_all.txt"
 
-df = read.table(nda_file,sep="\t",header=T)
-df = df[df$eventname=='baseline_year_1_arm_1', ]
-row.names(df) = df$src_subject_id
-df_untouched = df
+df = read.table(twin_file,sep="\t",header=T)
 
-twins = read.table(twin_file, header=T)
-twins_dizyg = read.table(dz_file, sep="\t", header=T)
-twins_monozyg = read.table(mz_file, sep="\t", header=T)
-twin_indiv = unique(c(as.character(twins_dizyg[,'twin1_IID1']), as.character(twins_dizyg[, 'twin2_IID2']),as.character(twins_monozyg[,'twin1_IID1']), as.character(twins_monozyg[, 'twin1_IID2'])))
+# twins = read.table(twin_file, header=T)
+# twins_dizyg = read.table(dz_file, sep="\t", header=T)
+# twins_monozyg = read.table(mz_file, sep="\t", header=T)
+# twin_indiv = unique(c(as.character(twins_dizyg[,'twin1_IID1']), as.character(twins_dizyg[, 'twin2_IID2']),as.character(twins_monozyg[,'twin1_IID1']), as.character(twins_monozyg[, 'twin1_IID2'])))
 
-# This yields 1667 individual participants - DS 2022-08-15
+# This df has 933 twin pairs - DS 2022-08-16
 
 # Load nih toolbox tasks
-nihtbx = read.table(nihtbx_file, sep="\t", header=T)
-nihtbx_tsks= c(colnames(nihtbx)[startsWith(colnames(df), 'nihtbx') & endsWith(colnames(df), 'uncorrected')], 'lmt_scr_perc_correct', 'pea_wiscv_trs', 'anthro_height_calc')
+# nihtbx = read.table(nihtbx_file, sep="\t", header=T)
+# nihtbx_tsks= c(colnames(nihtbx)[startsWith(colnames(df), 'nihtbx') & endsWith(colnames(df), 'uncorrected')], 'lmt_scr_perc_correct', 'pea_wiscv_trs', 'anthro_height_calc')
 
 # Select relevant individuals
-df = df[twin_indiv,]
+# df = df[twin_indiv,]
 
 # reformat dataframes
-
+df_untouched = df
+df = df[,]
 
 # Monozygotic coded as 1, Dizygotic coded as 2
-nl = create_nl(twins, df, nihtbx_tsks)
+df$zyg = NA
+df[df$twin1_genetic_zygosity=="Monozygotic",]$zyg = 1
+df[df$twin1_genetic_zygosity=="Dizygotic",]$zyg = 2
+
+# rename columns to format for later function
+names_orig = names(df)
+names_new = c()
+for (i in 1:length(names_orig)) {
+  if (grepl('twin1', names_orig[i], fixed = TRUE)) {
+    names_new[i] = paste0(substr(names_orig[i],7,1000),1)
+  }
+  else if (grepl('twin2', names_orig[i], fixed = TRUE)) {
+    names_new[i] = paste0(substr(names_orig[i],7,1000),2) 
+  }
+  else {
+    names_new[i] = names_orig[i]
+  }
+}
+
+names(df) = names_new
 
 # Write function for ACE Model
 estHerit <- function(nl, task){
@@ -149,9 +164,9 @@ estHerit <- function(nl, task){
      falkoner=2*(r_mz-r_dz), summary=sumACE)
 }
 
-estHerit(nl, 'nihtbx_fluidcomp_uncorrected')
+estHerit(df, 'nihtbx_fluidcomp_uncorrected')
 
-estHerit(nl, 'nihtbx_cryst_uncorrected')
+estHerit(df, 'nihtbx_cryst_uncorrected')
 
 # Look at warning messages from OpenMx
 tasks = nihtbx_tsks
