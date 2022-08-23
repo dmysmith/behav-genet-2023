@@ -1,9 +1,17 @@
 ################################
 
-# Create RDS file for random effects behavioral analysis 
+# Create data files for random effects behavioral analysis 
 # Diana Smith
 # April 2022
 
+################################
+# This script creates the following files:
+# 1. twins_res-age.sex
+# 2. all_res-age.sex
+# 3. all_res-age.sex.pcs
+# 4. all_res-age.sex.educ.inc
+# 5. all_res-age.sex.educ.inc.pcs
+rm(list=ls())
 ################################
 # load packages
 
@@ -18,18 +26,16 @@ library(pracma)
 # Define paths
 
 # tabulated ABCD data 
-inpath <- '/space/abcd-sync/4.0/tabulated/released'
+inpath <- '/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/tabulated/released'
 
 # genetic PCs subject data
-pcfile <- '/space/gwas-syn2/1/data/GWAS/ABCD/genotype/plink2.eigenvec'
+pcfile <- '/space/gwas-syn2/1/data/GWAS/ABCD/genotype_proc/imputation/pop_struct_smokescreen/ABCD_20220428.updated.nodups.curated_pcair.tsv'
 
-# path to the output RDS file 
-outpath <- '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral'
-fname <- 'nda4.0_offrel_behavioral.RDS'
-outmatfile <- paste0(outpath, '/', fname)
+# path to the output files
+outdir <- '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno'
 
 # cmig_utils/r directory
-funcpath <- '/home/d9smith/github/cmig_tools/cmig_tools_utils/r'
+funcpath <- '/home/d9smith/github/cmig_tools_internal/cmig_tools_utils/r'
 
 # The functionmakeDEAPdemos.R requires the path to the directory which 
 # contains the tabulated ABCD data defined explicitly here

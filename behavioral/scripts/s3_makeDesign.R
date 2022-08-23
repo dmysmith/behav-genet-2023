@@ -6,7 +6,7 @@
 
 ###############################################################
 # Define path to the makeDesign function 
-source('/home/d9smith/github/cmig_tools/cmig_tools_utils/r/makeDesign.R')
+source('/home/d9smith/github/cmig_tools_internal/cmig_tools_utils/r/makeDesign.R')
 
 ###############################################################
 # The function makeDesign reads variables from an R data frame. This 
@@ -15,12 +15,11 @@ source('/home/d9smith/github/cmig_tools/cmig_tools_utils/r/makeDesign.R')
 # mini RDS as in the example script createMiniRDS.R
 
 # Load the data 
-ndafile <- '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/nda4.0_offrel_behavioral.RDS'
+ndafile <- '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/nda4.0_offrel_behavioral.RDS'
 nda <- readRDS(ndafile)
 
 # Define the path to the directory where you would like to save out your design matrix 
-outpath <- '/home/d9smith/projects/random_effects/behavioral'
-
+outpath <- '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/designMat'
 
 ###############################################################
 # Design Matrix #1: All covariates
@@ -153,3 +152,20 @@ time <- c('baseline_year_1_arm_1', '2_year_follow_up_y_arm_1')
 
 # Now run makeDesign! 
 makeDesign(nda, outfile, time, contvar=contvar, catvar=catvar, delta=NULL, interact=NULL, subjs=NULL, demean=TRUE, quadratic=NULL)
+
+###############################################################
+# Design Matrix #0: "empty" design matrix
+# load age and sex only file
+infile = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/designMat/designMat2_agesex.txt"
+agesex = read.table(infile,sep="\t",header=T)
+
+# remove unnecessary rows
+agesex = agesex[,c("src_subject_id","eventname","rel_family_id","age","intercept")]
+
+# Define the name of your design matrix file 
+fname <- 'designMat0_empty.txt'
+# path to output directory
+outfile <- paste0(outpath, '/', fname)
+
+# save
+write.table(agesex, file=outfile, sep = "\t", row.names = FALSE)

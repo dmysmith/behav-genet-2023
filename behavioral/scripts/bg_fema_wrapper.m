@@ -2,8 +2,6 @@
 %% Diana Smith
 %% April 2022
 
-% - add simulated phenotype
-
 % Note: all models adjust for age and sex.
 
 % Model 1: (will run in OpenMx and FEMA)
@@ -28,7 +26,7 @@ addpath(genpath('/home/d9smith/github/cmig_tools_internal'));
 dataRelease = '4.0';
 
 % Path to store results
-outDir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/ml_results';
+outDir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results';
 
 % specify array of random effects
 random_effects = {{'F','A','E'};{'F','A','T','E'};{'F','A','T','H','E'};{'F','A','T','S','E'};{'F','A','T','H','S','E'};
@@ -48,7 +46,8 @@ dirname_imaging_longitudinal = '/space/syn50/1/data/ABCD/d9smith/random_effects/
 % Inputs to FEMA_wrapper.m
 atlasVersion = 'ABCD2_cor10';
 dirname_tabulated = fullfile('/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/tabulated/released/'); %KNOWN ISSUE: breaks when using txt files following NDA release --> must use pre-release csv files
-fname_pihat = fullfile('/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/genomics/ABCD_rel4.0_grm.mat');
+fname_pihat = fullfile('/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/genomics/ABCD_rel4.0_grm.mat'); % measured GRMs
+% fname_pihat = fullfile('/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/twins_assigned_grm.mat'); %assigned GRMs
 fname_addressID = fullfile('/home/sabad/requests/recent_addr_07182022.csv'); 
 fname_pregnancyID = fullfile('/home/sabad/requests/pregnancy_ID_07182022.csv');
 
@@ -65,7 +64,19 @@ logLikflag=1;
 ciflag=1;
 datatype='external'; % can use txt with columns of ANY data type (e.g. ROIs, behavior) - runs mass univaraite LME across every column
 
-RandomEffects = {'F';'A';'E'};
+if 0 % when only running one model
+    %fname_design = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/designMat/designMat0_empty.txt' % baseline only
+    fname_design = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/designMat/designMat1_allcovs.txt'
+    RandomEffects = {'F';'A';'S';'T';'E'};
+    dirname_imaging = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/all_res_agesexeducincpcs.txt' 
+    fstem_imaging = sprintf('%s',RandomEffects{:});
+    dirname_out = strcat(outDir, '/',dirname_imaging(71:end-4)); % when looping through design matrices
+    % dirname_out = strcat(outDir, '/',fname_design(1:-4)); % when only using one design matrix
+    disp(dirname_out);
+end
+
+
+
 
 %% loop through each design matrix
 for i = 1:numel(designmat_array)
