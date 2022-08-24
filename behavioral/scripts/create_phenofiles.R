@@ -147,7 +147,7 @@ twin_ids = loadtxt(file="/home/d9smith/projects/random_effects/behavioral/twinfi
 twin_ids$IID1_complete = twin_ids$IID1 %in% baseline_full$src_subject_id
 twin_ids$IID2_complete = twin_ids$IID2 %in% baseline_full$src_subject_id
 # save file with completeness info
-write.table(twin_ids, file="/home/d9smith/projects/random_effects/behavioral/twinfiles/twin_IDs_complete.txt")
+write.table(twin_ids, file="/home/d9smith/projects/random_effects/behavioral/twinfiles/twin_IDs_complete.txt", sep = "\t", row.names = FALSE)
 
 twin_complete = twin_ids[twin_ids$IID1_complete==T & twin_ids$IID2_complete==T,]
 

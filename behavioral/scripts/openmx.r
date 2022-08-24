@@ -22,20 +22,40 @@ source("/home/d9smith/projects/random_effects/behavioral/scripts/twin_functions.
 
 mxOption(NULL, "Default optimizer", 'SLSQP') # TODO - what does this do?
 
-# Load Data
-twin_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/ABCD_twins_all.txt"
-pheno_file = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/twins_res_agesex.txt"
+# Define the path to tge cmig_tools_utils/r directory
+funcpath <- '/home/d9smith/github/cmig_tools_internal/cmig_tools_utils/r'
+source(paste0(funcpath, '/', 'loadtxt.R'))
 
-twin = read.table(twin_file,sep="\t",header=T)
-twin_ids = twin[,c("IID1","IID2","twin1_genetic_zygosity")]
-pheno = read.table(pheno_file,sep="\t",header=T)
+# Load Data
+twin_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/twin_IDs_complete.txt"
+pheno_file = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/baseline_twins_res_agesexsite.txt"
+# pheno_file = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/twins_res_agesexsiteeducincpcs.txt" 
+
+zyg_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/ABCD_twins_all.txt"
+
+grm_file = "/space/gwas-syn2/1/data/GWAS/ABCD/genotype_proc/imputation/pop_struct_smokescreen/ABCD_20220428.updated.nodups.curated_GRM.tsv"
+
+twin = loadtxt(twin_file)
+
+twin_zyg = loadtxt(zyg_file)
+twin_zyg = twin_zyg[,c("IID1","IID2","twin1_genetic_zygosity")]
+
+twin <- merge(twin, twin_zyg, by=c("IID1","IID2"))
+twin_complete = twin[twin$IID1_complete==TRUE & twin$IID2_complete==TRUE,]
+twin_complete = twin_complete[,c("IID1","IID2","twin1_genetic_zygosity")]
+
+pheno = loadtxt(pheno_file)
 pheno1 = pheno
 pheno2 = pheno
 names(pheno1)[-(1:2)] = paste0(names(pheno)[-(1:2)],1)
 names(pheno2)[-(1:2)] = paste0(names(pheno)[-(1:2)],2)
 
-df = merge(twin_ids, pheno2, by.x=c("IID2"), by.y=c("src_subject_id"))
+df = merge(twin_complete, pheno2, by.x=c("IID2"), by.y=c("src_subject_id"))
 df = merge(df, pheno1, by.x=c("IID1"), by.y=c("src_subject_id"))
+
+# Note from DS 2022-08-24:
+# The resulting dataframe "df" contains 472 twin pairs, all with complete data for each twin. 
+# 271 DZ twin pairs, 201 MZ twin pairs.
 
 # twins = read.table(twin_file, header=T)
 # twins_dizyg = read.table(dz_file, sep="\t", header=T)
@@ -61,7 +81,8 @@ df$zyg = NA
 df[df$twin1_genetic_zygosity=="Monozygotic",]$zyg = 1
 df[df$twin1_genetic_zygosity=="Dizygotic",]$zyg = 2
 
-# save final list of IDs to pass to FEMA
+if (0) {
+  # save final list of IDs to pass to FEMA - deprecated as of 2022-08-24
 iid1 = df$IID1
 iid2 = df$IID2
 idlist_for_grm = df[,1:3]
@@ -71,8 +92,11 @@ write.table(idlist_for_grm, file=idlist__for_grm_outpath, sep = "\t", row.names 
 twins_res_agesex_mx<-rbind(pheno[pheno$src_subject_id %in% iid1,],pheno[pheno$src_subject_id %in% iid2,])
 outfile = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/twins_res_agesex_mx.txt" 
 write.table(twins_res_agesex_mx, file=outfile, sep = "\t", row.names = FALSE)
+}
 
-# rename columns to format for later function
+
+
+# rename columns to format for later function - deprecated as of 2022-08-24 
 if (0) {
   names_orig = names(df)
   names_new = c()
@@ -90,6 +114,9 @@ if (0) {
 
 names(df) = names_new
 }
+
+# import measured GRMs from GRM file
+
 
 
 # Write function for ACE Model
