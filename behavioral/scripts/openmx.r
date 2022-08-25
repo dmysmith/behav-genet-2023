@@ -33,16 +33,15 @@ pheno_file = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/ph
 
 zyg_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/ABCD_twins_all.txt"
 
-grm_file = "/space/gwas-syn2/1/data/GWAS/ABCD/genotype_proc/imputation/pop_struct_smokescreen/ABCD_20220428.updated.nodups.curated_GRM.tsv"
+grm_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/twins_measured_grm.txt"
 
 twin = loadtxt(twin_file)
 
-twin_zyg = loadtxt(zyg_file)
-twin_zyg = twin_zyg[,c("IID1","IID2","twin1_genetic_zygosity")]
+grm = read.table(grm_file,header = TRUE,sep=",")
 
-twin <- merge(twin, twin_zyg, by=c("IID1","IID2"))
+twin <- merge(twin, grm, by=c("IID1","IID2"))
 twin_complete = twin[twin$IID1_complete==TRUE & twin$IID2_complete==TRUE,]
-twin_complete = twin_complete[,c("IID1","IID2","twin1_genetic_zygosity")]
+twin_complete = twin_complete[,c("IID1","IID2","twin1_genetic_zygosity","measured_grm")]
 
 pheno = loadtxt(pheno_file)
 pheno1 = pheno
@@ -52,6 +51,7 @@ names(pheno2)[-(1:2)] = paste0(names(pheno)[-(1:2)],2)
 
 df = merge(twin_complete, pheno2, by.x=c("IID2"), by.y=c("src_subject_id"))
 df = merge(df, pheno1, by.x=c("IID1"), by.y=c("src_subject_id"))
+
 
 # Note from DS 2022-08-24:
 # The resulting dataframe "df" contains 472 twin pairs, all with complete data for each twin. 
@@ -115,12 +115,8 @@ if (0) {
 names(df) = names_new
 }
 
-# import measured GRMs from GRM file
-
-
-
 # Write function for ACE Model
-estHerit <- function(nl, task){
+estHerit <- function(nl, task, measured_grm=FALSE){
     nv        <- 1                         # number of variables
     ntv       <- nv*2                      # number of total variables
     selVars   <- paste(task,c(rep(1,nv),rep(2,nv)),sep="")
@@ -149,11 +145,25 @@ estHerit <- function(nl, task){
     covE      <- mxAlgebra( expression=e %*% t(e), name="E" )
 
     # Create Algebra for expected Variance/Covariance Matrices in MZ & DZ twins
-    covP      <- mxAlgebra( expression= A+C+E, name="V" )
-    covMZ     <- mxAlgebra( expression= A+C, name="cMZ" )
-    covDZ     <- mxAlgebra( expression= 0.5%x%A+ C, name="cDZ" )
-    expCovMZ  <- mxAlgebra( expression= rbind( cbind(V, cMZ), cbind(t(cMZ), V)), name="expCovMZ" )
-    expCovDZ  <- mxAlgebra( expression= rbind( cbind(V, cDZ), cbind(t(cDZ), V)), name="expCovDZ" )
+    if (measured_grm==TRUE) {
+      covP      <- mxAlgebra(expression= A+C+E, name="V" )
+      relA      <- mxMatrix( type="Stand", nrow=ntv, ncol=ntv, free=FALSE, labels=c("measured_grm"), name="rA" ) 
+      relC      <- mxMatrix( type="Unit", nrow=ntv, ncol=ntv, free=FALSE, name="C" ) 
+      relE      <- mxMatrix( type="Iden", nrow=ntv, ncol=ntv, free=FALSE, name="E" )
+
+      covMZ     <- mxAlgebra( expression= A+C, name="cMZ" )
+      covDZ     <- mxAlgebra( expression= 0.5%x%A+ C, name="cDZ" ) 
+
+      expCovMZ  <- mxAlgebra( expression= rbind( cbind(V, cMZ), cbind(t(cMZ), V)), name="expCovMZ" )
+      expCovDZ  <- mxAlgebra( expression= rbind( cbind(V, cDZ), cbind(t(cDZ), V)), name="expCovDZ" )
+
+    } else {
+      covP      <- mxAlgebra( expression= A+C+E, name="V" )
+      covMZ     <- mxAlgebra( expression= A+C, name="cMZ" )
+      covDZ     <- mxAlgebra( expression= 0.5%x%A+ C, name="cDZ" )
+      expCovMZ  <- mxAlgebra( expression= rbind( cbind(V, cMZ), cbind(t(cMZ), V)), name="expCovMZ" )
+      expCovDZ  <- mxAlgebra( expression= rbind( cbind(V, cDZ), cbind(t(cDZ), V)), name="expCovDZ" )
+    }
 
     # Create Data Objects for Multiple Groups
     dataMZ    <- mxData( observed=mzData, type="raw" )
@@ -216,7 +226,7 @@ estHerit <- function(nl, task){
      falkoner=2*(r_mz-r_dz), summary=sumACE)
 }
 
-estHerit(df, 'nihtbx_fluidcomp_uncorrected')
+estHerit(df, 'nihtbx_fluidcomp_uncorrected', measured_grm=TRUE)
 
 estHerit(df, 'nihtbx_cryst_uncorrected')
 
@@ -233,7 +243,7 @@ E <- data.frame(
   task=tasks
 )
 for (t in 1:length(tasks)){
-    result = estHerit(df, tasks[t])
+    result = estHerit(df, tasks[t], measured_grm=FALSE)
     A[tasks==tasks[t], 'openmx'] = as.numeric(result$a2)
     A[tasks==tasks[t], 'openmx_ci_lower'] = result$CI.A[1]
     A[tasks==tasks[t], 'openmx_ci_upper'] = result$CI.A[2]
