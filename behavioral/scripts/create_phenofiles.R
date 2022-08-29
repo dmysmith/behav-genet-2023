@@ -86,13 +86,17 @@ fullmat <- join(fullmat, lmt, by=c('src_subject_id', 'eventname'))
 
 ################################
 # Create dataframe "baseline" that includes all variables at baseline
-baselinevars <- names(fullmat)[-(1:20)]
-baseline <- fullmat[fullmat$eventname=='baseline_year_1_arm_1',baselinevars]
+baselinevars <- c("nihtbx_reading_uncorrected", "nihtbx_flanker_uncorrected", "nihtbx_cardsort_uncorrected", 
+        "nihtbx_pattern_uncorrected", "nihtbx_picture_uncorrected", "nihtbx_picvocab_uncorrected", 
+        "nihtbx_list_uncorrected", "nihtbx_totalcomp_uncorrected", "nihtbx_fluidcomp_uncorrected", 
+        "nihtbx_cryst_uncorrected", "pea_wiscv_trs", "anthroheightcalc") 
+baseline <- fullmat[fullmat$eventname=='baseline_year_1_arm_1',c('src_subject_id','eventname',baselinevars)]
+
 
 ################################
 # Create dataframe "longitudinal" that includes baseline and year 2 for all variables with data
 y2vars <- c('src_subject_id','eventname', 'nihtbx_picvocab_uncorrected','nihtbx_flanker_uncorrected','nihtbx_pattern_uncorrected',
-'nihtbx_picture_uncorrected','nihtbx_reading_uncorrected','nihtbx_cryst_uncorrected','lmt_scr_perc_correct','anthroheightcalc')
+'nihtbx_picture_uncorrected','nihtbx_reading_uncorrected','nihtbx_cryst_uncorrected','anthroheightcalc')
 
 longitudinal <- fullmat[,y2vars]
 
@@ -195,3 +199,5 @@ write.table(baseline_full_res_agesexsitepcs, file=paste0(outpath, '/', 'baseline
 write.table(baseline_full_res_agesexsiteeducinc, file=paste0(outpath, '/', 'baseline_full_res_agesexsiteeducinc.txt'), sep = "\t", row.names = FALSE)
 write.table(baseline_full_res_agesexsiteeducincpcs, file=paste0(outpath, '/', 'baseline_full_res_agesexsiteeducincpcs.txt'), sep = "\t", row.names = FALSE)
 write.table(baseline_twins_res_agesexsiteeducincpcs, file=paste0(outpath, '/', 'baseline_twins_res_agesexsiteeducincpcs.txt'), sep = "\t", row.names = FALSE)
+
+## TODO: create pheno files for longitudinal data, residualized for age, sex, site, and practice effect.

@@ -56,41 +56,15 @@ df = merge(df, pheno1, by.x=c("IID1", "eventname"), by.y=c("src_subject_id", "ev
 # The resulting dataframe "df" contains 472 twin pairs, all with complete data for each twin. 
 # 271 DZ twin pairs, 201 MZ twin pairs.
 
-# twins = read.table(twin_file, header=T)
-# twins_dizyg = read.table(dz_file, sep="\t", header=T)
-# twins_monozyg = read.table(mz_file, sep="\t", header=T)
-# twin_indiv = unique(c(as.character(twins_dizyg[,'twin1_IID1']), as.character(twins_dizyg[, 'twin2_IID2']),as.character(twins_monozyg[,'twin1_IID1']), as.character(twins_monozyg[, 'twin1_IID2'])))
-
-# This df has 933 twin pairs - DS 2022-08-16
-# new df has 676 twin pairs - DS 2022-08-16 (pre-residualized)
-
-# Load nih toolbox tasks
-# nihtbx = read.table(nihtbx_file, sep="\t", header=T)
-# nihtbx_tsks= c(colnames(nihtbx)[startsWith(colnames(df), 'nihtbx') & endsWith(colnames(df), 'uncorrected')], 'lmt_scr_perc_correct', 'pea_wiscv_trs', 'anthro_height_calc')
-
-# Select relevant individuals
-# df = df[twin_indiv,]
-
-# reformat dataframes
-# df_untouched = df
-# df = df[,]
-
 # Monozygotic coded as 1, Dizygotic coded as 2
 df$zyg = NA
 df[df$twin1_genetic_zygosity=="Monozygotic",]$zyg = 1
 df[df$twin1_genetic_zygosity=="Dizygotic",]$zyg = 2
 
-if (0) {
-  # save final list of IDs to pass to FEMA - deprecated as of 2022-08-24
-iid1 = df$IID1
-iid2 = df$IID2
-idlist_for_grm = df[,1:3]
-idlist__for_grm_outpath = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/twins_ids_for_grm.txt" 
-write.table(idlist_for_grm, file=idlist__for_grm_outpath, sep = "\t", row.names = FALSE)
+if (0){
+df[df$twin1_genetic_zygosity=="Monozygotic",]$measured_grm = 1
+df[df$twin1_genetic_zygosity=="Dizygotic",]$measured_grm = 0.5
 
-twins_res_agesex_mx<-rbind(pheno[pheno$src_subject_id %in% iid1,],pheno[pheno$src_subject_id %in% iid2,])
-outfile = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/twins_res_agesex_mx.txt" 
-write.table(twins_res_agesex_mx, file=outfile, sep = "\t", row.names = FALSE)
 }
 
 # Write function for ACE Model
@@ -117,7 +91,7 @@ estHerit <- function(data, task, measured_grm=FALSE){
     # PREPARE MODEL
 
     # Create Algebra for expected Mean Matrices
-    intercept     <- mxMatrix( type="Full", nrow=1, ncol=ntv, free=TRUE, values=sMu, labels="interC", name="intercept" )
+    intercept     <- mxMatrix( type="Full", nrow=1, ncol=ntv, free=TRUE, values=sMu, labels=task, name="intercept" )
     expMean       <- mxAlgebra(expression = intercept, name="expMean" )
 
     # Create Matrices for Variance Components
@@ -152,10 +126,11 @@ estHerit <- function(data, task, measured_grm=FALSE){
     estVC     <- mxAlgebra( expression=cbind(A,C,E,A/V,C/V,E/V), name="VC", dimnames=list(rowVC,colVC) )
 
     # Create Confidence Interval Objects
-    ciACE     <- mxCI( "VC[1,4:6]" )
+    ciACE     <- mxCI( "VC[1,1:6]" )
 
     # Build Model with Confidence Intervals
     modelACE   <- mxModel( "oneACEc", defs, pars, expMean, expCov, dataTW, expTW, funML, estVC, ciACE )
+
 } else {
     # Set Starting Values
     svMe      <- rnorm(1)                       # start value for means
@@ -262,20 +237,30 @@ C <- data.frame(
 E <- data.frame(
   task=tasks
 )
+
+loglik <- data.frame(
+  task=tasks
+)
+
 for (t in 1:length(tasks)){
-    result = estHerit(df, tasks[t], measured_grm=TRUE)
-    A[tasks==tasks[t], 'openmx'] = as.numeric(result$a2)
-    A[tasks==tasks[t], 'openmx_ci_lower'] = result$CI.A[1]
-    A[tasks==tasks[t], 'openmx_ci_upper'] = result$CI.A[2]
-    # C compoenent
-    C[tasks==tasks[t], 'openmx'] = as.numeric(result$c2)
-    C[tasks==tasks[t], 'openmx_ci_lower'] = result$CI.C[1]
-    C[tasks==tasks[t], 'openmx_ci_upper'] = result$CI.C[2]
-    # E compoenent
-    E[tasks==tasks[t], 'openmx'] = as.numeric(result$e2)
-    E[tasks==tasks[t], 'openmx_ci_lower'] = result$CI.E[1]
-    E[tasks==tasks[t], 'openmx_ci_upper'] = result$CI.E[2]
+  result = estHerit(df, tasks[t], measured_grm=FALSE)
+  A[tasks==tasks[t], 'openmx'] = as.numeric(result$a2)
+  A[tasks==tasks[t], 'openmx_ci_lower'] = result$CI.A[1]
+  A[tasks==tasks[t], 'openmx_ci_upper'] = result$CI.A[2]
+  # C compoenent
+  C[tasks==tasks[t], 'openmx'] = as.numeric(result$c2)
+  C[tasks==tasks[t], 'openmx_ci_lower'] = result$CI.C[1]
+  C[tasks==tasks[t], 'openmx_ci_upper'] = result$CI.C[2]
+  # E compoenent
+  E[tasks==tasks[t], 'openmx'] = as.numeric(result$e2)
+  E[tasks==tasks[t], 'openmx_ci_lower'] = result$CI.E[1]
+  E[tasks==tasks[t], 'openmx_ci_upper'] = result$CI.E[2]
+
+  # log likelihood
+  loglik[tasks==tasks[t], 'openmx_loglik'] = result$summary.Minus2LogLikelihood / (-2)
 }
+
+## Unused code from Rob
 
 A$task <- factor(A$task, levels = A$task)
 ggplot(A[1:11,]) +
