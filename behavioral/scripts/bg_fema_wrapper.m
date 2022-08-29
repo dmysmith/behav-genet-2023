@@ -26,7 +26,7 @@ addpath(genpath('/home/d9smith/github/cmig_tools_internal'));
 dataRelease = '4.0';
 
 % Path to store results
-outDir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results';
+outDir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/assigned_grm';
 
 % specify array of random effects
 random_effects = {{'F','A','E'};{'F','A','T','E'};{'F','A','T','H','E'};{'F','A','T','S','E'};{'F','A','T','H','S','E'};
@@ -68,7 +68,7 @@ if 0 % when only running one model
     %fname_design = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/designMat/designMat0_empty.txt' % baseline only
     fname_design = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/designMat/designMat1_allcovs.txt'
     RandomEffects = {'F';'A';'S';'T';'E'};
-    dirname_imaging = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/all_res_agesexeducincpcs.txt' 
+    dirname_imaging = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/baseline_twins_res_agesexsite.txt'; 
     fstem_imaging = sprintf('%s',RandomEffects{:});
     dirname_out = strcat(outDir, '/',dirname_imaging(71:end-4)); % when looping through design matrices
     % dirname_out = strcat(outDir, '/',fname_design(1:-4)); % when only using one design matrix
