@@ -35,102 +35,115 @@ logLikflag=1;
 ciflag=1;
 datatype='external'; % can use txt with columns of ANY data type (e.g. ROIs, behavior) - runs mass univaraite LME across every column
 
+fstem_imaging = {}; RandomEffects = {}; fname_pihat = {}; dirname_imaging = {};
+
 %% Model 1: FAE Model, twins only at baseline, genetic relatedness assumed (will also run in OpenMx)
-fstem_imaging = 'model1';
-RandomEffects = {'F';'A';'E'}; 
-fname_pihat = twin_grm_file; 
-dirname_imaging = strcat(pheno_dir,'/','baseline_twins_res_agesexsite.txt');
-
-% run FEMA
-[fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm inputs mask tfce_perm colnames_interest save_params logLikvec Hessmat] = FEMA_wrapper(fstem_imaging, fname_design, dirname_out, dirname_tabulated, dirname_imaging, datatype,...
-'ranknorm', ranknorm, 'contrasts', contrasts, 'RandomEffects', RandomEffects, 'pihat_file', fname_pihat, 'nperms', nperms, 'mediation',mediation,'PermType',PermType,'tfce',tfce,'preg_file',fname_pregnancyID,'address_file',fname_addressID,...
-'Hessflag',Hessflag,'ciflag',ciflag,'logLikflag',logLikflag,'RandomEstType',RandomEstType);
-
-disp(sig2mat);
-disp(logLikvec);
+i=1;
+fstem_imaging{i} = "model1";
+RandomEffects{i} = {'F';'A';'E'}; 
+fname_pihat{i} = twin_grm_file; 
+dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsite.txt');
 
 %% Model 2: FAE Model, twins only at baseline, with GRM included.
-fstem_imaging = 
-RandomEffects = {'F';'A';'E'};
-fname_pihat = measured_grm_file;
-dirname_imaging = 
-
-% run FEMA
-[fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm inputs mask tfce_perm colnames_interest save_params logLikvec Hessmat] = FEMA_wrapper(fstem_imaging, fname_design, dirname_out, dirname_tabulated, dirname_imaging, datatype,...
-'ranknorm', ranknorm, 'contrasts', contrasts, 'RandomEffects', RandomEffects, 'pihat_file', fname_pihat, 'nperms', nperms, 'mediation',mediation,'PermType',PermType,'tfce',tfce,'preg_file',fname_pregnancyID,'address_file',fname_addressID,...
-'Hessflag',Hessflag,'ciflag',ciflag,'logLikflag',logLikflag,'RandomEstType',RandomEstType);
+i=2;
+fstem_imaging{i} = 'model2'; 
+RandomEffects{i} = {'F';'A';'E'};
+fname_pihat{i} = measured_grm_file;
+dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsite.txt'); 
 
 %% Model 3: FAE Model, full sample at baseline, with GRM included within family.
-fstem_imaging = 
-RandomEffects = {'F';'A';'E'};
-fname_pihat = measured_grm_file;
-dirname_imaging = 
-
-% run FEMA
-[fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm inputs mask tfce_perm colnames_interest save_params logLikvec Hessmat] = FEMA_wrapper(fstem_imaging, fname_design, dirname_out, dirname_tabulated, dirname_imaging, datatype,...
-'ranknorm', ranknorm, 'contrasts', contrasts, 'RandomEffects', RandomEffects, 'pihat_file', fname_pihat, 'nperms', nperms, 'mediation',mediation,'PermType',PermType,'tfce',tfce,'preg_file',fname_pregnancyID,'address_file',fname_addressID,...
-'Hessflag',Hessflag,'ciflag',ciflag,'logLikflag',logLikflag,'RandomEstType',RandomEstType);
+i=3;
+fstem_imaging{i} = 'model3';
+RandomEffects{i} = {'F';'A';'E'};
+fname_pihat{i} = measured_grm_file;
+dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsite.txt');  
 
 %% Model 4: FATE Model, full sample at baseline, with GRM within family.
-fstem_imaging = 
-RandomEffects = {'F';'A';'T';'E'};
-fname_pihat = measured_grm_file;
-dirname_imaging = 
-
-% run FEMA
-[fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm inputs mask tfce_perm colnames_interest save_params logLikvec Hessmat] = FEMA_wrapper(fstem_imaging, fname_design, dirname_out, dirname_tabulated, dirname_imaging, datatype,...
-'ranknorm', ranknorm, 'contrasts', contrasts, 'RandomEffects', RandomEffects, 'pihat_file', fname_pihat, 'nperms', nperms, 'mediation',mediation,'PermType',PermType,'tfce',tfce,'preg_file',fname_pregnancyID,'address_file',fname_addressID,...
-'Hessflag',Hessflag,'ciflag',ciflag,'logLikflag',logLikflag,'RandomEstType',RandomEstType);
+i=4;
+fstem_imaging{i} = 'model4';
+RandomEffects{i} = {'F';'A';'T';'E'};
+fname_pihat{i} = measured_grm_file;
+dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsite.txt');  
 
 %% Model 5: FASTE Model, full sample at baseline and year 2, with GRM within family. 
 % Note that all longitudinal analyses should include data that is preresidualized for age, sex, site, and practice effect.
-fstem_imaging = 
-RandomEffects = {'F';'A';'S';'T';'E'};
-fname_pihat = measured_grm_file;
-dirname_imaging = 
-
-% run FEMA
-[fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm inputs mask tfce_perm colnames_interest save_params logLikvec Hessmat] = FEMA_wrapper(fstem_imaging, fname_design, dirname_out, dirname_tabulated, dirname_imaging, datatype,...
-'ranknorm', ranknorm, 'contrasts', contrasts, 'RandomEffects', RandomEffects, 'pihat_file', fname_pihat, 'nperms', nperms, 'mediation',mediation,'PermType',PermType,'tfce',tfce,'preg_file',fname_pregnancyID,'address_file',fname_addressID,...
-'Hessflag',Hessflag,'ciflag',ciflag,'logLikflag',logLikflag,'RandomEstType',RandomEstType);
+i=5;
+fstem_imaging{i} = 'model5';
+RandomEffects{i} = {'F';'A';'S';'T';'E'};
+fname_pihat{i} = measured_grm_file;
+dirname_imaging{i} = 
 
 %% Side question #1: discretizing zygosity
 % Run models 3-5 with assigned zygosity.
-fstem_imaging = 
-RandomEffects = 
-fname_pihat = 
-dirname_imaging = 
+i=6;
+fstem_imaging{i} = 's1_assigngrm_m3';
+RandomEffects{i} = {'F';'A';'E'};
+fname_pihat{i} = assigned_grm_file;
+dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsite.txt');  
 
-% run FEMA
-[fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm inputs mask tfce_perm colnames_interest save_params logLikvec Hessmat] = FEMA_wrapper(fstem_imaging, fname_design, dirname_out, dirname_tabulated, dirname_imaging, datatype,...
-'ranknorm', ranknorm, 'contrasts', contrasts, 'RandomEffects', RandomEffects, 'pihat_file', fname_pihat, 'nperms', nperms, 'mediation',mediation,'PermType',PermType,'tfce',tfce,'preg_file',fname_pregnancyID,'address_file',fname_addressID,...
-'Hessflag',Hessflag,'ciflag',ciflag,'logLikflag',logLikflag,'RandomEstType',RandomEstType);
+i=7;
+fstem_imaging{i} = 's1_assigngrm_m4';
+RandomEffects{i} = {'F';'A';'T';'E'}; 
+fname_pihat{i} = assigned_grm_file; 
+dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsite.txt');  
+
+i=8;
+fstem_imaging{i} = 's1_assigngrm_m5';
+RandomEffects{i} = 
+fname_pihat{i} = 
+dirname_imaging{i} =
 
 %% Side question #2: including fixed effect covariates
 % Run models 1-5, preresidualized for all fixed effect covariates (genetic PCs, parental education, income).
 % Note that only Model 1 will be reported in main text.
-fstem_imaging = 
-RandomEffects = 
-fname_pihat = measured_grm_file;
-dirname_imaging = 
+i=9;
+fstem_imaging{i} = 's2_allcovs_m1';
+RandomEffects{i} = {'F';'A';'E'}; 
+fname_pihat{i} = twin_grm_file;
+dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt'); 
 
-% run FEMA
-[fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm inputs mask tfce_perm colnames_interest save_params logLikvec Hessmat] = FEMA_wrapper(fstem_imaging, fname_design, dirname_out, dirname_tabulated, dirname_imaging, datatype,...
-'ranknorm', ranknorm, 'contrasts', contrasts, 'RandomEffects', RandomEffects, 'pihat_file', fname_pihat, 'nperms', nperms, 'mediation',mediation,'PermType',PermType,'tfce',tfce,'preg_file',fname_pregnancyID,'address_file',fname_addressID,...
-'Hessflag',Hessflag,'ciflag',ciflag,'logLikflag',logLikflag,'RandomEstType',RandomEstType);
+i=10;
+fstem_imaging{i} = 's2_allcovs_m2';
+RandomEffects{i} = {'F';'A';'E'}; 
+fname_pihat{i} = measured_grm_file;
+dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
+
+i=11;
+fstem_imaging{i} = 's2_allcovs_m3';
+RandomEffects{i} = {'F';'A';'E'}; 
+fname_pihat{i} = measured_grm_file;
+dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
+
+i=12;
+fstem_imaging{i} = 's2_allcovs_m4';
+RandomEffects{i} = {'F';'A';'T';'E'}; 
+fname_pihat{i} = measured_grm_file;
+dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
+
+i=13;
+fstem_imaging{i} = 's2_allcovs_m5';
+RandomEffects{i} = {'F';'A';'S';'T';'E'}; 
+fname_pihat{i} = measured_grm_file;
+dirname_imaging{i} =
 
 %% Side question #3: are twins necessary?
-% Run FASE model, full sample at baseline and year 2, with GRM within family.
+% Run FASE model, full sample minus twins at baseline and year 2, with GRM within family.
 % Note that all longitudinal analyses should include data that is preresidualized for age, sex, site, and practice effect.
-fstem_imaging = 
-RandomEffects = 
-fname_pihat = measured_grm_file; 
-dirname_imaging =
+i=14;
+fstem_imaging{i} = 's3_notwins';
+RandomEffects{i} = {'F';'A';'S';'E';}
+fname_pihat{i} = measured_grm_file; 
+dirname_imaging{i} =
 
 % run FEMA
-[fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm inputs mask tfce_perm colnames_interest save_params logLikvec Hessmat] = FEMA_wrapper(fstem_imaging, fname_design, dirname_out, dirname_tabulated, dirname_imaging, datatype,...
-'ranknorm', ranknorm, 'contrasts', contrasts, 'RandomEffects', RandomEffects, 'pihat_file', fname_pihat, 'nperms', nperms, 'mediation',mediation,'PermType',PermType,'tfce',tfce,'preg_file',fname_pregnancyID,'address_file',fname_addressID,...
-'Hessflag',Hessflag,'ciflag',ciflag,'logLikflag',logLikflag,'RandomEstType',RandomEstType);
+for i = 1:length(fstem_imaging)
+    [fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm inputs mask tfce_perm colnames_interest save_params logLikvec Hessmat] = FEMA_wrapper(fstem_imaging{i}, fname_design, dirname_out, dirname_tabulated, dirname_imaging{i}, datatype,...
+    'ranknorm', ranknorm, 'contrasts', contrasts, 'RandomEffects', RandomEffects{i}, 'pihat_file', fname_pihat{i}, 'nperms', nperms, 'mediation',mediation,'PermType',PermType,'tfce',tfce,'preg_file',fname_pregnancyID,'address_file',fname_addressID,...
+    'Hessflag',Hessflag,'ciflag',ciflag,'logLikflag',logLikflag,'RandomEstType',RandomEstType);
+    save(fnames_out{:}, 'logLikvec', '-append');
+    save(fnames_out{:}, 'fstem_imaging', '-append');
+    save(fnames_out{:}, 'RandomEffects', '-append');
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% extra code, no longer used

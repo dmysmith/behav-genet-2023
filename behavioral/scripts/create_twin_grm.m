@@ -12,6 +12,8 @@ load(grm_file);
 twin_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/ABCD_twins_all.txt";
 twin = readtable(twin_file);
 twin = twin(:,["IID1", "IID2", "twin1_genetic_zygosity"]);
+twin.measured_grm = repmat(0.5,size(twin,1),1);
+
 % replace with identity matrix
 GRM_old = GRM;
 GRM = eye(size(GRM));
