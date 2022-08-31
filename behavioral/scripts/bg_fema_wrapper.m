@@ -13,6 +13,7 @@ dirname_out = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/result
 
 % paths to inputs
 measured_grm_file = fullfile('/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/genomics/ABCD_rel4.0_grm.mat');
+assigned_grm_file = fullfile('/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/all_discrete_grm.mat');
 twin_grm_file = fullfile('/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/twins_assigned_grm.mat');
 pheno_dir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno';
 
@@ -71,7 +72,7 @@ i=5;
 fstem_imaging{i} = 'model5';
 RandomEffects{i} = {'F';'A';'S';'T';'E'};
 fname_pihat{i} = measured_grm_file;
-dirname_imaging{i} = 
+dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsiteprac.txt');   
 
 %% Side question #1: discretizing zygosity
 % Run models 3-5 with assigned zygosity.
@@ -89,9 +90,9 @@ dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsite.txt');
 
 i=8;
 fstem_imaging{i} = 's1_assigngrm_m5';
-RandomEffects{i} = 
-fname_pihat{i} = 
-dirname_imaging{i} =
+RandomEffects{i} = {'F';'A';'S';'T';'E'};
+fname_pihat{i} = assigned_grm_file;
+dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsiteprac.txt'); 
 
 %% Side question #2: including fixed effect covariates
 % Run models 1-5, preresidualized for all fixed effect covariates (genetic PCs, parental education, income).
@@ -124,7 +125,7 @@ i=13;
 fstem_imaging{i} = 's2_allcovs_m5';
 RandomEffects{i} = {'F';'A';'S';'T';'E'}; 
 fname_pihat{i} = measured_grm_file;
-dirname_imaging{i} =
+dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsitepraceducincpcs.txt');
 
 %% Side question #3: are twins necessary?
 % Run FASE model, full sample minus twins at baseline and year 2, with GRM within family.
@@ -133,7 +134,7 @@ i=14;
 fstem_imaging{i} = 's3_notwins';
 RandomEffects{i} = {'F';'A';'S';'E';}
 fname_pihat{i} = measured_grm_file; 
-dirname_imaging{i} =
+dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_notwins_res_agesexsiteprac.txt');
 
 % run FEMA
 for i = 1:length(fstem_imaging)

@@ -18,6 +18,13 @@ twin.measured_grm = repmat(0.5,size(twin,1),1);
 GRM_old = GRM;
 GRM = eye(size(GRM));
 
+% create assigned GRM for all participants
+GRM_assigned = nan(size(GRM));
+
+for grmi = 1:size(GRM_assigned,1)
+    GRM_assigned(grmi,grmi) = 1;
+end
+
 % loop through twin pairs
 for twini = 1:size(twin,1)
     i = find(strcmp(iid_list,twin{twini,1}));
@@ -26,6 +33,8 @@ for twini = 1:size(twin,1)
         GRM(i,j) = 1;
         GRM(j,i) = 1;
         twin{twini,"measured_grm"} = 1; % if we don't have measured GRM, this will assign 1
+        GRM_assigned(i,j) = 1;
+        GRM_assigned(j,i) = 1;
     elseif strcmp(twin{twini,3},'Dizygotic') % assign 0.5 for dz
         GRM(i,j) = 0.5;
         GRM(j,i) = 0.5;
@@ -38,9 +47,13 @@ for twini = 1:size(twin,1)
     end
 end
 
-% save new GRM file
+% save twin GRM files
 outfile = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/twins_assigned_grm.mat';
 save(outfile, 'GRM', 'iid_list');
 
 twin_grm_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/twins_measured_grm.txt";
 writetable(twin, twin_grm_file);
+
+assigned_GRM_file = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/all_discrete_grm.mat'; 
+save(assigned_GRM_file, 'GRM_assigned','iid_list')
+

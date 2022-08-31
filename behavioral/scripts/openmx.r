@@ -43,7 +43,7 @@ twin <- merge(twin, grm, by=c("IID1","IID2"))
 twin_complete = twin[twin$IID1_complete==TRUE & twin$IID2_complete==TRUE,]
 twin_complete = twin_complete[,c("IID1","IID2","twin1_genetic_zygosity","measured_grm")]
 
-pheno = loadtxt(pheno_file)
+pheno = read.table(pheno_file, header = TRUE, sep = "\t")
 pheno1 = pheno
 pheno2 = pheno
 names(pheno1)[-(1:2)] = paste0(names(pheno)[-(1:2)],1)
