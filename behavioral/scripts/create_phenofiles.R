@@ -241,5 +241,3 @@ write.table(baseline_twins_res_agesexsiteeducincpcs, file=paste0(outpath, '/', '
 write.table(longitudinal_full_res_agesexsiteprac, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsiteprac.txt'), sep = "\t", row.names = FALSE)
 write.table(longitudinal_full_res_agesexsitepraceducincpcs, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsitepraceducincpcs.txt'), sep = "\t", row.names = FALSE)
 write.table(longitudinal_notwins_res_agesexsiteprac, file=paste0(outpath, '/', 'longitudinal_notwins_res_agesexsiteprac.txt'), sep = "\t", row.names = FALSE)
-
-## TODO: create pheno files for longitudinal data, residualized for age, sex, site, and practice effect.
