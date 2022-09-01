@@ -3,31 +3,15 @@
 % may 2022
 
 % inputs
-results_dir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20220829';
-modelname = {'model1'; 'model2'; 'model3'; 'model4'};
-
+results_dir = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20220829";
 outpath = "/home/d9smith/projects/random_effects/behavioral/results/plots"; % outpath = "/home/d9smith/tmp";
-results_file = strcat(results_dir,'/FEMA_wrapper_output_external_',modelname,'.mat');
 
-titles = {
-'FAE Model, twins only at baseline, GRM assumed';
-'FAE Model, twins only at baseline, with GRM';
-'FAE Model, full sample at baseline, with GRM';
-'FATE Model, full sample at baseline, with GRM';
-'FASTE Model, full sample at baseline and year 2, with GRM';
-'FAE Model, full sample at baseline, discrete zygosity';
-'FATE Model, full sample at baseline, discrete zygosity';
-'FASTE Model, full sample at baseline and year 2, discrete zygosity';
-'FAE Model, twins only at baseline, GRM assumed, residualized for covariates';
-'FAE Model, twins only at baseline, with GRM, residualized for covariates';
-'FAE Model, full sample at baseline, with GRM, residualized for covariates';
-'FATE Model, full sample at baseline, with GRM, residualized for covariates';
-'FASTE Model, full sample at baseline and year 2, with GRM, residualized for covariates';
-'FASE model, full sample minus twins at baseline and year 2, with GRM';
-}
+param_file = strcat(results_dir, '/', 'model_parameters.mat');
+load(param_file);
 
+results_file = strcat(results_dir,"/FEMA_wrapper_output_external_",fstem_imaging',".mat");
 
-for i=1:size(modelname,1)
+for i=1:size(fstem_imaging,2)
     load(results_file{i});
     phenotypes = colnames_imaging;
 
@@ -37,7 +21,11 @@ for i=1:size(modelname,1)
     elseif isequal(RandomEffects{i}, {'F';'A';'S';'E'})
         colors = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.4940 0.1840 0.5560;0.4660 0.6740 0.1880];
     elseif isequal(RandomEffects{i}, {'F';'A';'E'})
-        colors = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.4660 0.6740 0.1880]; 
+        colors = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.4660 0.6740 0.1880];
+    elseif isequal(RandomEffects{i}, {'F';'A';'T';'E'})
+        colors = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.9290 0.6940 0.1250;0.4660 0.6740 0.1880]; 
+    elseif isequal(RandomEffects{i}, {'F';'A';'S';'T';'E'})
+        colors = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.4940 0.1840 0.5560;0.9290 0.6940 0.1250;0.4660 0.6740 0.1880]; 
     end
 
     % make figure 
@@ -50,6 +38,7 @@ for i=1:size(modelname,1)
     end
     xlabel('Phenotype');
     ylabel('Percent of Variance');
+    ylim([0 1]);
     hold on
     % Calculate the number of groups and number of bars in each group
     [ngroups,nbars] = size(model_series);
@@ -65,7 +54,7 @@ for i=1:size(modelname,1)
     set(gca,'TickLabelInterpreter','none')
     xticklabels(phenotypes);
     xtickangle(45);
-    title(sprintf('%s: %s',fstem_imaging{i}, titles{i}));
+    title(sprintf('%s: %s',fstem_imaging{i}, titles{i}),'interpreter', 'none');
 
     % save figure
     figname = sprintf('%s/%s.png',outpath,fstem_imaging{i});
@@ -73,7 +62,12 @@ for i=1:size(modelname,1)
 
 end
 
-%% old code
+for i=1:size(fstem_imaging,2)
+    load(results_file{i});
+    disp(fstem_imaging{i});
+    disp(num2str(logLikvec));
+
+end
 if 0
     fname_design = 'designMat1_allcovs';
     nperms = 1000;

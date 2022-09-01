@@ -36,18 +36,20 @@ logLikflag=1;
 ciflag=1;
 datatype='external'; % can use txt with columns of ANY data type (e.g. ROIs, behavior) - runs mass univaraite LME across every column
 
-fstem_imaging = {}; RandomEffects = {}; fname_pihat = {}; dirname_imaging = {};
+fstem_imaging = {}; RandomEffects = {}; fname_pihat = {}; dirname_imaging = {}; titles = {};
 
 %% Model 1: FAE Model, twins only at baseline, genetic relatedness assumed (will also run in OpenMx)
 i=1;
-fstem_imaging{i} = "model1";
+fstem_imaging{i} = 'model1';
+titles{i} = 'FAE Model, twins only at baseline, GRM assumed';
 RandomEffects{i} = {'F';'A';'E'}; 
 fname_pihat{i} = twin_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsite.txt');
 
 %% Model 2: FAE Model, twins only at baseline, with GRM included.
 i=2;
-fstem_imaging{i} = 'model2'; 
+fstem_imaging{i} = 'model2';
+titles{i} =  'FAE Model, twins only at baseline, with GRM';
 RandomEffects{i} = {'F';'A';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsite.txt'); 
@@ -55,6 +57,7 @@ dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsite.txt');
 %% Model 3: FAE Model, full sample at baseline, with GRM included within family.
 i=3;
 fstem_imaging{i} = 'model3';
+titles{i} = 'FAE Model, full sample at baseline, with GRM';
 RandomEffects{i} = {'F';'A';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsite.txt');  
@@ -62,6 +65,7 @@ dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsite.txt');
 %% Model 4: FATE Model, full sample at baseline, with GRM within family.
 i=4;
 fstem_imaging{i} = 'model4';
+titles{i} = 'FATE Model, full sample at baseline, with GRM';
 RandomEffects{i} = {'F';'A';'T';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsite.txt');  
@@ -70,6 +74,7 @@ dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsite.txt');
 % Note that all longitudinal analyses should include data that is preresidualized for age, sex, site, and practice effect.
 i=5;
 fstem_imaging{i} = 'model5';
+titles{i} = 'FASTE Model, full sample at baseline and year 2, with GRM';
 RandomEffects{i} = {'F';'A';'S';'T';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsiteprac.txt');   
@@ -78,18 +83,21 @@ dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsiteprac.
 % Run models 3-5 with assigned zygosity.
 i=6;
 fstem_imaging{i} = 's1_assigngrm_m3';
+titles{i} = 'FAE Model, full sample at baseline, discrete zygosity';
 RandomEffects{i} = {'F';'A';'E'};
 fname_pihat{i} = assigned_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsite.txt');  
 
 i=7;
 fstem_imaging{i} = 's1_assigngrm_m4';
+titles{i} = 'FATE Model, full sample at baseline, discrete zygosity';
 RandomEffects{i} = {'F';'A';'T';'E'}; 
 fname_pihat{i} = assigned_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsite.txt');  
 
 i=8;
 fstem_imaging{i} = 's1_assigngrm_m5';
+titles{i} = 'FASTE Model, full sample at baseline and year 2, discrete zygosity';
 RandomEffects{i} = {'F';'A';'S';'T';'E'};
 fname_pihat{i} = assigned_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsiteprac.txt'); 
@@ -99,30 +107,35 @@ dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsiteprac.
 % Note that only Model 1 will be reported in main text.
 i=9;
 fstem_imaging{i} = 's2_allcovs_m1';
+titles{i} = 'FAE Model, twins only at baseline, GRM assumed, residualized for covariates';
 RandomEffects{i} = {'F';'A';'E'}; 
 fname_pihat{i} = twin_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt'); 
 
 i=10;
 fstem_imaging{i} = 's2_allcovs_m2';
+titles{i} = 'FAE Model, twins only at baseline, with GRM, residualized for covariates';
 RandomEffects{i} = {'F';'A';'E'}; 
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
 
 i=11;
 fstem_imaging{i} = 's2_allcovs_m3';
+titles{i} = 'FAE Model, full sample at baseline, with GRM, residualized for covariates';
 RandomEffects{i} = {'F';'A';'E'}; 
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
 
 i=12;
 fstem_imaging{i} = 's2_allcovs_m4';
+titles{i} = 'FATE Model, full sample at baseline, with GRM, residualized for covariates';
 RandomEffects{i} = {'F';'A';'T';'E'}; 
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
 
 i=13;
 fstem_imaging{i} = 's2_allcovs_m5';
+titles{i} = 'FASTE Model, full sample at baseline and year 2, with GRM, residualized for covariates';
 RandomEffects{i} = {'F';'A';'S';'T';'E'}; 
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsitepraceducincpcs.txt');
@@ -132,9 +145,12 @@ dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsiteprace
 % Note that all longitudinal analyses should include data that is preresidualized for age, sex, site, and practice effect.
 i=14;
 fstem_imaging{i} = 's3_notwins';
+titles{i} = 'FASE model, full sample minus twins at baseline and year 2, with GRM';
 RandomEffects{i} = {'F';'A';'S';'E';}
 fname_pihat{i} = measured_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_notwins_res_agesexsiteprac.txt');
+
+save(strcat(dirname_out, '/', 'model_parameters.mat'), 'fstem_imaging', 'titles');
 
 % run FEMA
 for i = 1:length(fstem_imaging)
@@ -145,6 +161,8 @@ for i = 1:length(fstem_imaging)
     save(fnames_out{:}, 'fstem_imaging', '-append');
     save(fnames_out{:}, 'RandomEffects', '-append');
 end
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% extra code, no longer used

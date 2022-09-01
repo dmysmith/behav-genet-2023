@@ -54,6 +54,7 @@ save(outfile, 'GRM', 'iid_list');
 twin_grm_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/twins_measured_grm.txt";
 writetable(twin, twin_grm_file);
 
+GRM = GRM_assigned;
 assigned_GRM_file = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/all_discrete_grm.mat'; 
-save(assigned_GRM_file, 'GRM_assigned','iid_list')
+save(assigned_GRM_file, 'GRM','iid_list')
 
