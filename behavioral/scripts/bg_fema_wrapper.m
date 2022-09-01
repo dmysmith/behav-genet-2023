@@ -9,7 +9,7 @@ addpath(genpath('/home/d9smith/github/cmig_tools_internal'));
 dataRelease = '4.0';
 
 % Path to store results
-dirname_out = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20220829';
+dirname_out = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20220901';
 
 % paths to inputs
 measured_grm_file = fullfile('/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/genomics/ABCD_rel4.0_grm.mat');
@@ -77,7 +77,7 @@ fstem_imaging{i} = 'model5';
 titles{i} = 'FASTE Model, full sample at baseline and year 2, with GRM';
 RandomEffects{i} = {'F';'A';'S';'T';'E'};
 fname_pihat{i} = measured_grm_file;
-dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsiteprac.txt');   
+dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsite.txt');   
 
 %% Side question #1: discretizing zygosity
 % Run models 3-5 with assigned zygosity.
@@ -100,7 +100,7 @@ fstem_imaging{i} = 's1_assigngrm_m5';
 titles{i} = 'FASTE Model, full sample at baseline and year 2, discrete zygosity';
 RandomEffects{i} = {'F';'A';'S';'T';'E'};
 fname_pihat{i} = assigned_grm_file;
-dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsiteprac.txt'); 
+dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsite.txt'); 
 
 %% Side question #2: including fixed effect covariates
 % Run models 1-5, preresidualized for all fixed effect covariates (genetic PCs, parental education, income).
@@ -138,7 +138,7 @@ fstem_imaging{i} = 's2_allcovs_m5';
 titles{i} = 'FASTE Model, full sample at baseline and year 2, with GRM, residualized for covariates';
 RandomEffects{i} = {'F';'A';'S';'T';'E'}; 
 fname_pihat{i} = measured_grm_file;
-dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsitepraceducincpcs.txt');
+dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsiteeducincpcs.txt');
 
 %% Side question #3: are twins necessary?
 % Run FASE model, full sample minus twins at baseline and year 2, with GRM within family.
@@ -148,7 +148,7 @@ fstem_imaging{i} = 's3_notwins';
 titles{i} = 'FASE model, full sample minus twins at baseline and year 2, with GRM';
 RandomEffects{i} = {'F';'A';'S';'E';}
 fname_pihat{i} = measured_grm_file; 
-dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_notwins_res_agesexsiteprac.txt');
+dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_notwins_res_agesexsite.txt');
 
 save(strcat(dirname_out, '/', 'model_parameters.mat'), 'fstem_imaging', 'titles');
 

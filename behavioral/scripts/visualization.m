@@ -3,8 +3,10 @@
 % may 2022
 
 % inputs
-results_dir = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20220829";
+results_dir = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20220901";
 outpath = "/home/d9smith/projects/random_effects/behavioral/results/plots"; % outpath = "/home/d9smith/tmp";
+
+addpath(genpath('/home/d9smith/projects/random_effects/behavioral/scripts'));
 
 param_file = strcat(results_dir, '/', 'model_parameters.mat');
 load(param_file);
@@ -12,62 +14,37 @@ load(param_file);
 results_file = strcat(results_dir,"/FEMA_wrapper_output_external_",fstem_imaging',".mat");
 
 for i=1:size(fstem_imaging,2)
-    load(results_file{i});
-    phenotypes = colnames_imaging;
-
-    % define set of colors so they match across models
-    if isequal(RandomEffects{i}, {'F';'A';'D';'S';'E'})
-        colors = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.9290 0.6940 0.1250;0.4940 0.1840 0.5560;0.4660 0.6740 0.1880];
-    elseif isequal(RandomEffects{i}, {'F';'A';'S';'E'})
-        colors = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.4940 0.1840 0.5560;0.4660 0.6740 0.1880];
-    elseif isequal(RandomEffects{i}, {'F';'A';'E'})
-        colors = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.4660 0.6740 0.1880];
-    elseif isequal(RandomEffects{i}, {'F';'A';'T';'E'})
-        colors = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.9290 0.6940 0.1250;0.4660 0.6740 0.1880]; 
-    elseif isequal(RandomEffects{i}, {'F';'A';'S';'T';'E'})
-        colors = [0 0.4470 0.7410;0.8500 0.3250 0.0980;0.4940 0.1840 0.5560;0.9290 0.6940 0.1250;0.4660 0.6740 0.1880]; 
-    end
-
-    % make figure 
-    model_series = transpose(sig2mat(:,:,1)); 
-    model_error_low = transpose(sig2mat(:,:,2)); 
-    model_error_high = transpose(sig2mat(:,:,3));
-    b = bar(model_series,'FaceColor','flat');
-    for k = 1:size(sig2mat,1)
-        b(k).CData = colors(k,:);
-    end
-    xlabel('Phenotype');
-    ylabel('Percent of Variance');
-    ylim([0 1]);
-    hold on
-    % Calculate the number of groups and number of bars in each group
-    [ngroups,nbars] = size(model_series);
-    % Get the x coordinate of the bars
-    x = nan(nbars, ngroups);
-    for bari = 1:nbars
-        x(bari,:) = b(bari).XEndPoints;
-    end
-    % Plot the errorbars
-    errorbar(x',model_series,model_series-model_error_low,model_error_high-model_series,'k','linestyle','none');
-    hold off
-    legend(RandomEffects{i}(:), 'Location','eastoutside');
-    set(gca,'TickLabelInterpreter','none')
-    xticklabels(phenotypes);
-    xtickangle(45);
-    title(sprintf('%s: %s',fstem_imaging{i}, titles{i}),'interpreter', 'none');
-
-    % save figure
-    figname = sprintf('%s/%s.png',outpath,fstem_imaging{i});
-    saveas(gcf, figname);
-
+    visualize_ds(results_file{i}, outpath, fstem_imaging, titles, i)
 end
 
-for i=1:size(fstem_imaging,2)
-    load(results_file{i});
-    disp(fstem_imaging{i});
-    disp(num2str(logLikvec));
+% load openmx data
 
-end
+mxa_file = strcat(results_dir,"/openmx_A.csv"); 
+mxc_file = strcat(results_dir,"/openmx_C.csv"); 
+mxe_file = strcat(results_dir,"/openmx_E.csv"); 
+mxloglik_file = strcat(results_dir,"/openmx_loglik.csv"); 
+
+mxa = readtable(mxa_file);
+mxc = readtable(mxc_file);
+mxe = readtable(mxe_file);
+mxloglik = readtable(mxloglik_file);
+
+i=15;
+fstem_imaging{i} = "openmx";
+titles{i} = "OpenMx ACE/FAE Model, twins only at baseline, GRM assumed";
+RandomEffects{i} = {'F';'A';'E'};
+colnames_imaging = mxa.task';
+
+sig2mat(:,:,1) = [mxc.openmx';mxa.openmx';mxe.openmx'];
+sig2mat(:,:,2) = [mxc.openmx_ci_lower';mxa.openmx_ci_lower';mxe.openmx_ci_lower'];
+sig2mat(:,:,3) = [mxc.openmx_ci_upper';mxa.openmx_ci_upper';mxe.openmx_ci_upper'];
+
+mx_results_file = strcat(results_dir, '/', 'openmx.mat');
+
+save(mx_results_file, 'sig2mat','RandomEffects','colnames_imaging');
+
+visualize_ds(mx_results_file, outpath, fstem_imaging, titles, i);
+
 if 0
     fname_design = 'designMat1_allcovs';
     nperms = 1000;
@@ -97,6 +74,19 @@ if 0
     if RandomEffects == "FADSE"
         sig2mat_AD = sig2mat_perm(2,:,:) + sig2mat_perm(3,:,:);
         figure;histogram(sig2mat_AD(:,8,2:end));title('FADSE Model: A+D');
+    end
+
+    for i=1:size(fstem_imaging,2)
+        load(results_file{i});
+        disp(fstem_imaging{i});
+        disp(sig2mat);
+    
+    end
+
+    for i=1:size(fstem_imaging,2)
+        load(results_file{i});
+        disp(size(iid));
+    
     end
 
 end

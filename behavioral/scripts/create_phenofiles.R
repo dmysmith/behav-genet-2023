@@ -228,7 +228,31 @@ longitudinal_notwins_res_agesexsiteprac = longitudinal_notwins[,c("src_subject_i
 allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + abcd_site + prac"), as.formula)
 allModelsResults <- lapply(allModelsList, function(x) lm(x, data = longitudinal_notwins, na.action = na.exclude))
 allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = longitudinal_notwins)))  
-longitudinal_notwins_res_agesexsiteprac[,-(1:2)] = allModelsResiduals 
+longitudinal_notwins_res_agesexsiteprac[,-(1:2)] = allModelsResiduals
+
+# 10. longitudinal_full_res_agesexsite
+longitudinal_full_res_agesexsite = longitudinal_full[,c("src_subject_id", "eventname", y2vars)]
+allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + abcd_site"), as.formula)
+allModelsResults <- lapply(allModelsList, function(x) lm(x, data = longitudinal_full, na.action = na.exclude))
+allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = longitudinal_full)))  
+longitudinal_full_res_agesexsite[,-(1:2)] = allModelsResiduals 
+
+# 11. longitudinal_full_res_agesexsiteeducincpcs
+longitudinal_full_res_agesexsiteeducincpcs = longitudinal_full[,c("src_subject_id", "eventname", y2vars)]
+allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + abcd_site + high.educ + household.income + PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10"), as.formula)
+allModelsResults <- lapply(allModelsList, function(x) lm(x, data = longitudinal_full, na.action = na.exclude))
+allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = longitudinal_full)))  
+longitudinal_full_res_agesexsiteeducincpcs[,-(1:2)] = allModelsResiduals 
+
+# 12. longitudinal_notwins_res_agesexsite
+all_twin_ids = c(as.character(twin_ids$IID1),as.character(twin_ids$IID2))
+longitudinal_notwins = longitudinal_full[-which(longitudinal_full$src_subject_id %in% all_twin_ids),]
+
+longitudinal_notwins_res_agesexsite = longitudinal_notwins[,c("src_subject_id", "eventname", y2vars)]
+allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + abcd_site"), as.formula)
+allModelsResults <- lapply(allModelsList, function(x) lm(x, data = longitudinal_notwins, na.action = na.exclude))
+allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = longitudinal_notwins)))  
+longitudinal_notwins_res_agesexsite[,-(1:2)] = allModelsResiduals 
 
 # save phenofiles - all baseline for now - DS 2022-08-16
 write.table(baseline_full_res_agesexsite, file=paste0(outpath, '/', 'baseline_full_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
@@ -241,3 +265,7 @@ write.table(baseline_twins_res_agesexsiteeducincpcs, file=paste0(outpath, '/', '
 write.table(longitudinal_full_res_agesexsiteprac, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsiteprac.txt'), sep = "\t", row.names = FALSE)
 write.table(longitudinal_full_res_agesexsitepraceducincpcs, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsitepraceducincpcs.txt'), sep = "\t", row.names = FALSE)
 write.table(longitudinal_notwins_res_agesexsiteprac, file=paste0(outpath, '/', 'longitudinal_notwins_res_agesexsiteprac.txt'), sep = "\t", row.names = FALSE)
+
+write.table(longitudinal_full_res_agesexsite, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
+write.table(longitudinal_full_res_agesexsiteeducincpcs, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsiteeducincpcs.txt'), sep = "\t", row.names = FALSE)
+write.table(longitudinal_notwins_res_agesexsite, file=paste0(outpath, '/', 'longitudinal_notwins_res_agesexsite.txt'), sep = "\t", row.names = FALSE)

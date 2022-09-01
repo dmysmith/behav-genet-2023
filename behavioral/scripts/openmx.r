@@ -12,13 +12,12 @@ rm(list=ls())
 # ------------------------------------------------------------------------------
 # # Load Libraries & Options
 library(OpenMx)
-library(reshape)
-library(psych)
-library(Matrix)
-library(stringi)
-library('ggplot2')
+
+library(R.matlab)
 source("/home/d9smith/projects/random_effects/behavioral/scripts/miFunctions2.R")
 source("/home/d9smith/projects/random_effects/behavioral/scripts/twin_functions.R")
+
+outpath = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20220901"
 
 mxOption(NULL, "Default optimizer", 'SLSQP') # TODO - what does this do?
 
@@ -35,7 +34,7 @@ zyg_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/ABCD_twin
 
 grm_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/twins_measured_grm.txt"
 
-twin = loadtxt(twin_file)
+twin = read.table(twin_file, header = T, sep = "\t")
 
 grm = read.table(grm_file,header = TRUE,sep=",")
 
@@ -260,33 +259,48 @@ for (t in 1:length(tasks)){
   loglik[tasks==tasks[t], 'openmx_loglik'] = result$summary.Minus2LogLikelihood / (-2)
 }
 
+# save estimates to matlab file
+# writeMat(con = paste(outpath, "/", "openmx.mat", sep = ""), x = c(as.matrix(A), as.matrix(C), as.matrix(E), as.matrix(loglik)))
+
+write.csv(A, paste(outpath, "openmx_A.csv", sep = "/"), row.names=F)
+write.csv(C, paste(outpath, "openmx_C.csv", sep = "/"), row.names=F)
+write.csv(E, paste(outpath, "openmx_E.csv", sep = "/"), row.names=F)
+write.csv(loglik, paste(outpath, "openmx_loglik.csv", sep = "/"), row.names=F)
+
 ## Unused code from Rob
+if (0) {
 
-A$task <- factor(A$task, levels = A$task)
-ggplot(A[1:11,]) +
-    geom_bar( aes(x=task, y=openmx), stat="identity", fill="skyblue", alpha=0.7)+
-    geom_errorbar( aes(x=task, ymin=openmx_ci_lower, ymax=openmx_ci_upper), width=0.4, colour="orange", alpha=0.9, size=1.3) + 
-    theme(axis.text.x = element_text(angle = 45, hjust = 1), 
-         text = element_text(size=20)) + 
-    ylab('Heritability')
+  library(reshape)
+  library(psych)
+  library(Matrix)
+  library(stringi)
+  library('ggplot2')
 
-write.csv(A, '/home/rloughna/data/ABCD/heritability/twins/open_mx/herit_tlbx_residulised_with_CIs.csv',
-    row.names=F)
+  A$task <- factor(A$task, levels = A$task)
+  ggplot(A[1:11,]) +
+      geom_bar( aes(x=task, y=openmx), stat="identity", fill="skyblue", alpha=0.7)+
+      geom_errorbar( aes(x=task, ymin=openmx_ci_lower, ymax=openmx_ci_upper), width=0.4, colour="orange", alpha=0.9, size=1.3) + 
+      theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+          text = element_text(size=20)) + 
+      ylab('Heritability')
 
-# Uncorrected
-ACE = data.frame(task=tasks,E=E$openmx, C=C$openmx, A=A$openmx)
-ACE$task <- factor(ACE$task, levels = ACE$task)
-ACE = melt(ACE)
-ggplot(ACE, aes(x=task, y=value, fill=variable)) +
-    geom_bar(stat="identity") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
-#     geom_errorbar( aes(x=task, ymin=openmx_ci_lower, ymax=openmx_ci_upper), width=0.4, colour="orange", alpha=0.9, size=1.3) + 
+  write.csv(A, '/home/rloughna/data/ABCD/heritability/twins/open_mx/herit_tlbx_residulised_with_CIs.csv',
+      row.names=F)
 
-# Residualised for covariates
-ACE = data.frame(task=tasks,E=E$openmx, C=C$openmx, A=A$openmx)
-ACE$task <- factor(ACE$task, levels = ACE$task)
-ACE = melt(ACE)
-ggplot(ACE, aes(x=task, y=value, fill=variable)) +
-    geom_bar(stat="identity") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
-#
+  # Uncorrected
+  ACE = data.frame(task=tasks,E=E$openmx, C=C$openmx, A=A$openmx)
+  ACE$task <- factor(ACE$task, levels = ACE$task)
+  ACE = melt(ACE)
+  ggplot(ACE, aes(x=task, y=value, fill=variable)) +
+      geom_bar(stat="identity") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  #     geom_errorbar( aes(x=task, ymin=openmx_ci_lower, ymax=openmx_ci_upper), width=0.4, colour="orange", alpha=0.9, size=1.3) + 
 
+  # Residualised for covariates
+  ACE = data.frame(task=tasks,E=E$openmx, C=C$openmx, A=A$openmx)
+  ACE$task <- factor(ACE$task, levels = ACE$task)
+  ACE = melt(ACE)
+  ggplot(ACE, aes(x=task, y=value, fill=variable)) +
+      geom_bar(stat="identity") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  #
 
+}
