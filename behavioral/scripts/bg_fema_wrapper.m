@@ -150,10 +150,26 @@ RandomEffects{i} = {'F';'A';'S';'E';}
 fname_pihat{i} = measured_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_notwins_res_agesexsite.txt');
 
+%% TEST MODEL
+i=16;
+fstem_imaging{i} = 'test_y2';
+titles{i} = 'FAE model, full sample at year 2 only, with GRM, age, sex, site';
+RandomEffects{i} = {'F';'A';'E';}
+fname_pihat{i} = measured_grm_file; 
+dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesexsite.txt');
+
+i=17;
+fstem_imaging{i} = 'test_y2_allcovs';
+titles{i} = 'FAE model, full sample at year 2 only, with GRM, all covariates';
+RandomEffects{i} = {'F';'A';'E'};
+fname_pihat{i} = measured_grm_file; 
+dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesexsiteeducincpcs.txt');
+
 save(strcat(dirname_out, '/', 'model_parameters.mat'), 'fstem_imaging', 'titles');
 
 % run FEMA
 for i = 1:length(fstem_imaging)
+% for i = [16,17]
     [fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm inputs mask tfce_perm colnames_interest save_params logLikvec Hessmat] = FEMA_wrapper(fstem_imaging{i}, fname_design, dirname_out, dirname_tabulated, dirname_imaging{i}, datatype,...
     'ranknorm', ranknorm, 'contrasts', contrasts, 'RandomEffects', RandomEffects{i}, 'pihat_file', fname_pihat{i}, 'nperms', nperms, 'mediation',mediation,'PermType',PermType,'tfce',tfce,'preg_file',fname_pregnancyID,'address_file',fname_addressID,...
     'Hessflag',Hessflag,'ciflag',ciflag,'logLikflag',logLikflag,'RandomEstType',RandomEstType);

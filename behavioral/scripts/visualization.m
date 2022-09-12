@@ -13,7 +13,8 @@ load(param_file);
 
 results_file = strcat(results_dir,"/FEMA_wrapper_output_external_",fstem_imaging',".mat");
 
-for i=1:size(fstem_imaging,2)
+% for i=1:size(fstem_imaging,2)
+for i=[16,17]
     visualize_ds(results_file{i}, outpath, fstem_imaging, titles, i)
 end
 
