@@ -165,7 +165,7 @@ RandomEffects{i} = {'F';'A';'E'};
 fname_pihat{i} = measured_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesexsiteeducincpcs.txt');
 
-save(strcat(dirname_out, '/', 'model_parameters.mat'), 'fstem_imaging', 'titles');
+save(strcat(dirname_out, '/', 'model_parameters.mat'), 'fstem_imaging', 'titles', 'RandomEffects');
 
 % run FEMA
 for i = 1:length(fstem_imaging)
@@ -176,6 +176,23 @@ for i = 1:length(fstem_imaging)
     save(fnames_out{:}, 'logLikvec', '-append');
     save(fnames_out{:}, 'fstem_imaging', '-append');
     save(fnames_out{:}, 'RandomEffects', '-append');
+
+    json_out = sprintf('%s.json',fnames_out{:}(1:end-4));
+    sig2mat_out = sprintf('%s_sig2mat.json',fnames_out{:}(1:end-4));
+    
+    
+    fid = fopen(json_out,'w');
+    s = struct('beta_hat', beta_hat, 'beta_se', beta_se, 'zmat', zmat, 'logpmat', logpmat, 'sig2tvec', sig2tvec, ...
+      'colnames_interest', colnames_interest, 'logLikvec', logLikvec);
+    fprintf(fid,jsonencode(s));
+    fclose(fid);
+
+    fid = fopen(sig2mat_out,'w');
+    s = struct('sig2mat', sig2mat); 
+    % fprintf(fid,jsonencode(s));
+    fprintf(fid,jsonencode(sig2mat));  
+    fclose(fid);
+
 end
 
 
