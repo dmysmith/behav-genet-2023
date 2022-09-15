@@ -110,6 +110,10 @@ if ( ! dir.exists(outpath) ) {
 write.table(baseline, file=paste0(outpath, '/', 'baseline_unadjusted.txt'), sep = "\t", row.names = FALSE)
 write.table(longitudinal, file=paste0(outpath, '/', 'longitudinal_unadjusted.txt'), sep = "\t", row.names = FALSE)
 
+## Save variable names to be read by plotting jupyter notebook
+write.table(baselinevars, file=paste0(outpath, '/', 'baseline_phenonames.txt'), sep = "\t", row.names = FALSE)
+write.table(y2vars, file=paste0(outpath, '/', 'longitudinal_phenonames.txt'), sep = "\t", row.names = FALSE)
+
 ################################
 # Create several residualized .csv files
 ################################
@@ -252,7 +256,23 @@ longitudinal_notwins_res_agesexsite = longitudinal_notwins[,c("src_subject_id", 
 allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + abcd_site"), as.formula)
 allModelsResults <- lapply(allModelsList, function(x) lm(x, data = longitudinal_notwins, na.action = na.exclude))
 allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = longitudinal_notwins)))  
-longitudinal_notwins_res_agesexsite[,-(1:2)] = allModelsResiduals 
+longitudinal_notwins_res_agesexsite[,-(1:2)] = allModelsResiduals
+
+# 13. y2_full_res_agesexsite
+y2_full = longitudinal_full[longitudinal_full$eventname=="2_year_follow_up_y_arm_1",]
+
+y2_full_res_agesexsite = y2_full[,c("src_subject_id", "eventname", y2vars)]
+allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + abcd_site"), as.formula)
+allModelsResults <- lapply(allModelsList, function(x) lm(x, data = y2_full, na.action = na.exclude))
+allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = y2_full)))  
+y2_full_res_agesexsite[,-(1:2)] = allModelsResiduals
+
+# 14. y2_full_res_agesexsiteeducincpcs
+y2_full_res_agesexsiteeducincpcs = y2_full[,c("src_subject_id", "eventname", y2vars)]
+allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + abcd_site + high.educ + household.income + PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10"), as.formula)
+allModelsResults <- lapply(allModelsList, function(x) lm(x, data = y2_full, na.action = na.exclude))
+allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = y2_full)))  
+y2_full_res_agesexsiteeducincpcs[,-(1:2)] = allModelsResiduals
 
 # save phenofiles - all baseline for now - DS 2022-08-16
 write.table(baseline_full_res_agesexsite, file=paste0(outpath, '/', 'baseline_full_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
@@ -269,3 +289,6 @@ write.table(longitudinal_notwins_res_agesexsiteprac, file=paste0(outpath, '/', '
 write.table(longitudinal_full_res_agesexsite, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
 write.table(longitudinal_full_res_agesexsiteeducincpcs, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsiteeducincpcs.txt'), sep = "\t", row.names = FALSE)
 write.table(longitudinal_notwins_res_agesexsite, file=paste0(outpath, '/', 'longitudinal_notwins_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
+
+write.table(y2_full_res_agesexsite, file=paste0(outpath, '/', 'y2_full_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
+write.table(y2_full_res_agesexsiteeducincpcs, file=paste0(outpath, '/', 'y2_full_res_agesexsiteeducincpcs.txt'), sep = "\t", row.names = FALSE)
