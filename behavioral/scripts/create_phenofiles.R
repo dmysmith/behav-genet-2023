@@ -85,6 +85,11 @@ lmt <- lmt[,lmtvar]
 fullmat <- join(fullmat, lmt, by=c('src_subject_id', 'eventname'))
 
 ################################
+# Omit participants with height < 20 or > 80
+
+fullmat <- fullmat[fullmat$anthroheightcalc >= 20 & fullmat$anthroheightcalc <= 80,]
+
+################################
 # Create dataframe "baseline" that includes all variables at baseline
 baselinevars <- c("nihtbx_reading_uncorrected", "nihtbx_flanker_uncorrected", "nihtbx_cardsort_uncorrected", 
         "nihtbx_pattern_uncorrected", "nihtbx_picture_uncorrected", "nihtbx_picvocab_uncorrected", 
