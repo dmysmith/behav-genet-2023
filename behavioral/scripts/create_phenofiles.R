@@ -91,17 +91,18 @@ fullmat <- fullmat[fullmat$anthroheightcalc >= 20 & fullmat$anthroheightcalc <= 
 
 ################################
 # Create dataframe "baseline" that includes all variables at baseline
-baselinevars <- c("nihtbx_reading_uncorrected", "nihtbx_flanker_uncorrected", "nihtbx_cardsort_uncorrected", 
-        "nihtbx_pattern_uncorrected", "nihtbx_picture_uncorrected", "nihtbx_picvocab_uncorrected", 
-        "nihtbx_list_uncorrected", "nihtbx_totalcomp_uncorrected", "nihtbx_fluidcomp_uncorrected", 
-        "nihtbx_cryst_uncorrected", "pea_wiscv_trs", "anthroheightcalc") 
+baselinevars <- c( "pea_wiscv_trs", "nihtbx_pattern_uncorrected", "nihtbx_flanker_uncorrected", 
+        "nihtbx_cardsort_uncorrected", "nihtbx_list_uncorrected", "nihtbx_picture_uncorrected", 
+        "nihtbx_picvocab_uncorrected", "nihtbx_reading_uncorrected", "nihtbx_cryst_uncorrected",
+        "nihtbx_fluidcomp_uncorrected", "nihtbx_totalcomp_uncorrected", "anthroheightcalc")        
+
 baseline <- fullmat[fullmat$eventname=='baseline_year_1_arm_1',c('src_subject_id','eventname',baselinevars)]
 
 
 ################################
 # Create dataframe "longitudinal" that includes baseline and year 2 for all variables with data
-y2vars <- c('nihtbx_picvocab_uncorrected','nihtbx_flanker_uncorrected','nihtbx_pattern_uncorrected',
-'nihtbx_picture_uncorrected','nihtbx_reading_uncorrected','nihtbx_cryst_uncorrected','anthroheightcalc')
+y2vars <- c('nihtbx_pattern_uncorrected','nihtbx_flanker_uncorrected','nihtbx_picture_uncorrected',
+'nihtbx_picvocab_uncorrected','nihtbx_reading_uncorrected','nihtbx_cryst_uncorrected','anthroheightcalc')
 
 longitudinal <- fullmat[,c('src_subject_id','eventname',y2vars)]
 
