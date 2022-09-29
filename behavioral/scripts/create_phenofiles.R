@@ -301,6 +301,13 @@ allModelsResults <- lapply(allModelsList, function(x) lm(x, data = y2_full, na.a
 allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = y2_full)))  
 y2_full_res_agesexsite[,-(1:2)] = allModelsResiduals
 
+# 13b. y2_full_res_agesex
+y2_full_res_agesex = y2_full[,c("src_subject_id", "eventname", y2vars)]
+allModelsList <- lapply(paste(y2vars, "~ interview_age + sex"), as.formula)
+allModelsResults <- lapply(allModelsList, function(x) lm(x, data = y2_full, na.action = na.exclude))
+allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = y2_full)))  
+y2_full_res_agesex[,-(1:2)] = allModelsResiduals
+
 # 14. y2_full_res_agesexsiteeducincpcs
 y2_full_res_agesexsiteeducincpcs = y2_full[,c("src_subject_id", "eventname", y2vars)]
 allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + abcd_site + high.educ + household.income + PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10"), as.formula)
@@ -329,4 +336,5 @@ write.table(longitudinal_notwins_res_agesexsite, file=paste0(outpath, '/', 'long
 write.table(longitudinal_notwins_res_agesexprac, file=paste0(outpath, '/', 'longitudinal_notwins_res_agesexprac.txt'), sep = "\t", row.names = FALSE)
 
 write.table(y2_full_res_agesexsite, file=paste0(outpath, '/', 'y2_full_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
+write.table(y2_full_res_agesex, file=paste0(outpath, '/', 'y2_full_res_agesex.txt'), sep = "\t", row.names = FALSE)
 write.table(y2_full_res_agesexsiteeducincpcs, file=paste0(outpath, '/', 'y2_full_res_agesexsiteeducincpcs.txt'), sep = "\t", row.names = FALSE)
