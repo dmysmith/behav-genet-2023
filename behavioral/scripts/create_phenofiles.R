@@ -160,6 +160,13 @@ allModelsResults <- lapply(allModelsList, function(x) lm(x, data = baseline_full
 allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = baseline_full)))  
 baseline_full_res_agesexsite[,-(1:2)] = allModelsResiduals
 
+# 1b. baseline_full_res_agesex
+baseline_full_res_agesex = baseline_full[,c("src_subject_id", "eventname", baselinevars)]
+allModelsList <- lapply(paste(baselinevars, "~ interview_age + sex"), as.formula)
+allModelsResults <- lapply(allModelsList, function(x) lm(x, data = baseline_full, na.action = na.exclude))
+allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = baseline_full)))  
+baseline_full_res_agesex[,-(1:2)] = allModelsResiduals
+
 # 2. baseline_twins_res_agesexsite
 twin_ids = loadtxt(file="/home/d9smith/projects/random_effects/behavioral/twinfiles/twin_IDs.txt")
 
@@ -177,12 +184,19 @@ IID2_include = tmp[(dim(twin_complete)[1]+1):length(tmp)]
 twin_unique = twin_complete[IID1_include & IID2_include,]
 twin_id_unique = c(as.character(twin_unique[,1]), as.character(twin_unique[,2])) 
 twinmat = baseline_full[baseline_full$src_subject_id %in% twin_id_unique,]
-baseline_twins_res_agesexsite = twinmat[, c("src_subject_id", "eventname", baselinevars)]
 
+baseline_twins_res_agesexsite = twinmat[, c("src_subject_id", "eventname", baselinevars)]
 allModelsList <- lapply(paste(baselinevars, "~ interview_age + sex + abcd_site"), as.formula)
 allModelsResults <- lapply(allModelsList, function(x) lm(x, data = twinmat, na.action = na.exclude))
 allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = twinmat)))  
 baseline_twins_res_agesexsite[,-(1:2)] = allModelsResiduals
+
+# 2b. baseline_twins_res_agesex 
+baseline_twins_res_agesex = twinmat[, c("src_subject_id", "eventname", baselinevars)]
+allModelsList <- lapply(paste(baselinevars, "~ interview_age + sex"), as.formula)
+allModelsResults <- lapply(allModelsList, function(x) lm(x, data = twinmat, na.action = na.exclude))
+allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = twinmat)))  
+baseline_twins_res_agesex[,-(1:2)] = allModelsResiduals
 
 # save file with completeness info
 write.table(twin_unique, file="/home/d9smith/projects/random_effects/behavioral/twinfiles/twin_IDs_complete.txt", sep = "\t", row.names = FALSE)
@@ -221,7 +235,14 @@ longitudinal_full_res_agesexsiteprac = longitudinal_full[,c("src_subject_id", "e
 allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + abcd_site + prac"), as.formula)
 allModelsResults <- lapply(allModelsList, function(x) lm(x, data = longitudinal_full, na.action = na.exclude))
 allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = longitudinal_full)))  
-longitudinal_full_res_agesexsiteprac[,-(1:2)] = allModelsResiduals 
+longitudinal_full_res_agesexsiteprac[,-(1:2)] = allModelsResiduals
+
+# 7b. longitudinal_full_res_agesexprac
+longitudinal_full_res_agesexprac = longitudinal_full[,c("src_subject_id", "eventname", y2vars)]
+allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + prac"), as.formula)
+allModelsResults <- lapply(allModelsList, function(x) lm(x, data = longitudinal_full, na.action = na.exclude))
+allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = longitudinal_full)))  
+longitudinal_full_res_agesexprac[,-(1:2)] = allModelsResiduals 
 
 # 8. longitudinal_full_res_agesexsitepraceducincpcs
 longitudinal_full_res_agesexsitepraceducincpcs = longitudinal_full[,c("src_subject_id", "eventname", y2vars)]
@@ -264,6 +285,13 @@ allModelsResults <- lapply(allModelsList, function(x) lm(x, data = longitudinal_
 allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = longitudinal_notwins)))  
 longitudinal_notwins_res_agesexsite[,-(1:2)] = allModelsResiduals
 
+# 12b. longitudinal_notwins_res_agesexprac 
+longitudinal_notwins_res_agesexprac = longitudinal_notwins[,c("src_subject_id", "eventname", y2vars)]
+allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + prac"), as.formula)
+allModelsResults <- lapply(allModelsList, function(x) lm(x, data = longitudinal_notwins, na.action = na.exclude))
+allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = longitudinal_notwins)))  
+longitudinal_notwins_res_agesexprac[,-(1:2)] = allModelsResiduals
+
 # 13. y2_full_res_agesexsite
 y2_full = longitudinal_full[longitudinal_full$eventname=="2_year_follow_up_y_arm_1",]
 
@@ -282,19 +310,23 @@ y2_full_res_agesexsiteeducincpcs[,-(1:2)] = allModelsResiduals
 
 # save phenofiles - all baseline for now - DS 2022-08-16
 write.table(baseline_full_res_agesexsite, file=paste0(outpath, '/', 'baseline_full_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
+write.table(baseline_full_res_agesex, file=paste0(outpath, '/', 'baseline_full_res_agesex.txt'), sep = "\t", row.names = FALSE)
 write.table(baseline_twins_res_agesexsite, file=paste0(outpath, '/', 'baseline_twins_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
+write.table(baseline_twins_res_agesex, file=paste0(outpath, '/', 'baseline_twins_res_agesex.txt'), sep = "\t", row.names = FALSE)
 write.table(baseline_full_res_agesexsitepcs, file=paste0(outpath, '/', 'baseline_full_res_agesexsitepcs.txt'), sep = "\t", row.names = FALSE)
 write.table(baseline_full_res_agesexsiteeducinc, file=paste0(outpath, '/', 'baseline_full_res_agesexsiteeducinc.txt'), sep = "\t", row.names = FALSE)
 write.table(baseline_full_res_agesexsiteeducincpcs, file=paste0(outpath, '/', 'baseline_full_res_agesexsiteeducincpcs.txt'), sep = "\t", row.names = FALSE)
 write.table(baseline_twins_res_agesexsiteeducincpcs, file=paste0(outpath, '/', 'baseline_twins_res_agesexsiteeducincpcs.txt'), sep = "\t", row.names = FALSE)
 
 write.table(longitudinal_full_res_agesexsiteprac, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsiteprac.txt'), sep = "\t", row.names = FALSE)
+write.table(longitudinal_full_res_agesexprac, file=paste0(outpath, '/', 'longitudinal_full_res_agesexprac.txt'), sep = "\t", row.names = FALSE)
 write.table(longitudinal_full_res_agesexsitepraceducincpcs, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsitepraceducincpcs.txt'), sep = "\t", row.names = FALSE)
 write.table(longitudinal_notwins_res_agesexsiteprac, file=paste0(outpath, '/', 'longitudinal_notwins_res_agesexsiteprac.txt'), sep = "\t", row.names = FALSE)
 
 write.table(longitudinal_full_res_agesexsite, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
 write.table(longitudinal_full_res_agesexsiteeducincpcs, file=paste0(outpath, '/', 'longitudinal_full_res_agesexsiteeducincpcs.txt'), sep = "\t", row.names = FALSE)
 write.table(longitudinal_notwins_res_agesexsite, file=paste0(outpath, '/', 'longitudinal_notwins_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
+write.table(longitudinal_notwins_res_agesexprac, file=paste0(outpath, '/', 'longitudinal_notwins_res_agesexprac.txt'), sep = "\t", row.names = FALSE)
 
 write.table(y2_full_res_agesexsite, file=paste0(outpath, '/', 'y2_full_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
 write.table(y2_full_res_agesexsiteeducincpcs, file=paste0(outpath, '/', 'y2_full_res_agesexsiteeducincpcs.txt'), sep = "\t", row.names = FALSE)
