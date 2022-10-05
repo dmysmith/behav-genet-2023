@@ -41,7 +41,7 @@ fstem_imaging = {}; RandomEffects = {}; fname_pihat = {}; dirname_imaging = {}; 
 %% Model 1: ACE Model, twins only at baseline, genetic relatedness assumed (will also run in OpenMx)
 i=1;
 fstem_imaging{i} = 'model1';
-titles{i} = 'FEMA ACE Model, twins only at baseline, GRM assumed';
+titles{i} = 'FEMA ACE Model, twins only at baseline, assigned GRM';
 RandomEffects{i} = {'A';'F';'E'}; 
 fname_pihat{i} = twin_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesex.txt');
@@ -49,7 +49,7 @@ dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesex.txt');
 %% Model 2: ACE Model, twins only at baseline, with GRM included.
 i=2;
 fstem_imaging{i} = 'model2';
-titles{i} =  'ACE Model, twins only at baseline, with GRM';
+titles{i} =  'ACE Model, twins only at baseline, measured GRM';
 RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesex.txt'); 
@@ -57,7 +57,7 @@ dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesex.txt');
 %% Model 3: ACE Model, full sample at baseline, with GRM included within family.
 i=3;
 fstem_imaging{i} = 'model3';
-titles{i} = 'ACE Model, full sample at baseline, with GRM';
+titles{i} = 'ACE Model, full sample at baseline, measured GRM';
 RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesex.txt');  
@@ -65,7 +65,7 @@ dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesex.txt');
 %% Model 4: ACTE Model, full sample at baseline, with GRM within family.
 i=4;
 fstem_imaging{i} = 'model4';
-titles{i} = 'ACTE Model, full sample at baseline, with GRM';
+titles{i} = 'ACTE Model, full sample at baseline, measured GRM';
 RandomEffects{i} = {'A';'F';'T';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesex.txt'); 
@@ -74,7 +74,7 @@ dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesex.txt');
 % Note that all longitudinal analyses should include data that is preresidualized for age, sex, site, and practice effect.
 i=5;
 fstem_imaging{i} = 'model5';
-titles{i} = 'ACTE Model, full sample at baseline and year 2, with GRM';
+titles{i} = 'ACTE Model, full sample at baseline and year 2, measured GRM';
 RandomEffects{i} = {'A';'F';'T';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexprac.txt');   
@@ -83,7 +83,7 @@ dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexprac.txt'
 % Note that all longitudinal analyses should include data that is preresidualized for age, sex, site, and practice effect.
 i=6;
 fstem_imaging{i} = 'model6';
-titles{i} = 'ACTSE Model, full sample at baseline and year 2, with GRM';
+titles{i} = 'ACTSE Model, full sample at baseline and year 2, measured GRM';
 RandomEffects{i} = {'A';'F';'T';'S';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexprac.txt');   
@@ -92,21 +92,21 @@ dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexprac.txt'
 % Run models 3-5 with assigned zygosity.
 i=7;
 fstem_imaging{i} = 's1_assigngrm_m3';
-titles{i} = 'ACE Model, full sample at baseline, discrete zygosity';
+titles{i} = 'ACE Model, full sample at baseline, assigned GRM';
 RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = assigned_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesex.txt');  
 
 i=8;
 fstem_imaging{i} = 's1_assigngrm_m4';
-titles{i} = 'ACTE Model, full sample at baseline, discrete zygosity';
+titles{i} = 'ACTE Model, full sample at baseline, assigned GRM';
 RandomEffects{i} = {'A';'F';'T';'E'}; 
 fname_pihat{i} = assigned_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesex.txt');  
 
 i=9;
 fstem_imaging{i} = 's1_assigngrm_m5';
-titles{i} = 'ACTSE Model, full sample at baseline and year 2, discrete zygosity';
+titles{i} = 'ACTSE Model, full sample at baseline and year 2, assigned GRM';
 RandomEffects{i} = {'A';'F';'T';'S';'E'};
 fname_pihat{i} = assigned_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexprac.txt'); 
@@ -116,35 +116,35 @@ dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexprac.txt'
 % Note that only Model 1 will be reported in main text.
 i=10;
 fstem_imaging{i} = 's2_allcovs_m1';
-titles{i} = 'ACE Model, twins only at baseline, GRM assumed, residualized for covariates';
+titles{i} = 'ACE Model, twins only at baseline, assigned GRM, residualized for covariates';
 RandomEffects{i} = {'A';'F';'E'}; 
 fname_pihat{i} = twin_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt'); 
 
 i=11;
 fstem_imaging{i} = 's2_allcovs_m2';
-titles{i} = 'ACE Model, twins only at baseline, with GRM, residualized for covariates';
+titles{i} = 'ACE Model, twins only at baseline, measured GRM, residualized for covariates';
 RandomEffects{i} = {'A';'F';'E'}; 
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
 
 i=12;
 fstem_imaging{i} = 's2_allcovs_m3';
-titles{i} = 'ACE Model, full sample at baseline, with GRM, residualized for covariates';
+titles{i} = 'ACE Model, full sample at baseline, measured GRM, residualized for covariates';
 RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
 
 i=13;
 fstem_imaging{i} = 's2_allcovs_m4';
-titles{i} = 'ACTE Model, full sample at baseline, with GRM, residualized for covariates';
+titles{i} = 'ACTE Model, full sample at baseline, measured GRM, residualized for covariates';
 RandomEffects{i} = {'A';'F';'T';'E'}; 
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
 
 i=14;
 fstem_imaging{i} = 's2_allcovs_m5';
-titles{i} = 'ACTSE Model, full sample at baseline and year 2, with GRM, residualized for covariates';
+titles{i} = 'ACTSE Model, full sample at baseline and year 2, measured GRM, residualized for covariates';
 RandomEffects{i} = {'A';'F';'T';'S';'E'}; 
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsitepraceducincpcs.txt');
@@ -153,23 +153,30 @@ dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsiteprace
 % Run FASE (ACSE) model, full sample minus twins at baseline and year 2, with GRM within family.
 % Note that all longitudinal analyses should include data that is preresidualized for age, sex, site, and practice effect.
 i=15;
+fstem_imaging{i} = 's3_notwins_comparison';
+titles{i} = 'ACSE model, full sample at baseline and year 2, measured GRM';
+RandomEffects{i} = {'A';'F';'S';'E';}
+fname_pihat{i} = measured_grm_file; 
+dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexprac.txt');
+
+i=16;
 fstem_imaging{i} = 's3_notwins';
-titles{i} = 'ACSE model, full sample minus twins at baseline and year 2, with GRM';
+titles{i} = 'ACSE model, full sample minus twin sites at baseline and year 2, measured GRM';
 RandomEffects{i} = {'A';'F';'S';'E';}
 fname_pihat{i} = measured_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_notwins_res_agesexprac.txt');
 
 %% TEST MODELS
-i=16;
+i=17;
 fstem_imaging{i} = 'test_y2';
 titles{i} = 'ACE model, full sample at year 2 only, with GRM, age, sex';
 RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = measured_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesex.txt');
 
-i=17;
+i=18;
 fstem_imaging{i} = 'test_y2_allcovs';
-titles{i} = 'ACE model, full sample at year 2 only, with GRM, all covariates';
+titles{i} = 'ACE model, full sample at year 2 only, measured GRM, all covariates';
 RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = measured_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesexsiteeducincpcs.txt');

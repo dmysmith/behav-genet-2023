@@ -27,7 +27,7 @@ source(paste0(funcpath, '/', 'loadtxt.R'))
 
 # Load Data
 twin_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/twin_IDs_complete.txt"
-pheno_file = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/baseline_twins_res_agesexsite.txt"
+pheno_file = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/baseline_twins_res_agesex.txt"
 # pheno_file = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/twins_res_agesexsiteeducincpcs.txt" 
 
 zyg_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/ABCD_twins_all.txt"

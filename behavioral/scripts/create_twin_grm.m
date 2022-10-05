@@ -3,6 +3,9 @@
 % Diana Smith
 % Aug 2022
 
+addpath(genpath('/home/d9smith/github/cmig_tools/cmig_tools_utils/matlab'));
+addpath(genpath('/home/d9smith/.matlab'));
+
 % Load full GRM file
 grm_file = '/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/genomics/ABCD_rel4.0_grm.mat';
 load(grm_file);
@@ -25,6 +28,10 @@ for grmi = 1:size(GRM_assigned,1)
     GRM_assigned(grmi,grmi) = 1;
 end
 
+% create "notwin" matrix omitting all twin site pairs,
+% just to compare distribution of GRM values
+GRM_notwin = GRM_old;
+
 % loop through twin pairs
 for twini = 1:size(twin,1)
     i = find(strcmp(iid_list,twin{twini,1}));
@@ -44,6 +51,8 @@ for twini = 1:size(twin,1)
     % add measured GRM to twin table
     if isfinite(GRM_old(i,j))
         twin{twini,"measured_grm"}= GRM_old(i,j);
+        GRM_notwin(i,j) = NaN;
+        GRM_notwin(j,i) = NaN;
     end
 end
 
@@ -57,4 +66,18 @@ writetable(twin, twin_grm_file);
 GRM = GRM_assigned;
 assigned_GRM_file = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/all_discrete_grm.mat'; 
 save(assigned_GRM_file, 'GRM','iid_list')
+
+% for paper -- what is the distribution of GRM in the sample without twin site pts?
+
+for grmi = 1:size(GRM_notwin,1)
+    GRM_notwin(grmi,grmi) = NaN;
+end
+
+disp(sum(GRM_notwin(:) >= 0.9));
+if 0 % code to generate histogram
+    figure('visible','off');clf; 
+    histogram(GRM_notwin, 300);
+    ylim([0 2000]);
+    export_fig(gcf, '/home/d9smith/tmp/grm_notwin.png');
+end
 

@@ -315,7 +315,7 @@ allModelsResults <- lapply(allModelsList, function(x) lm(x, data = y2_full, na.a
 allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = y2_full)))  
 y2_full_res_agesexsiteeducincpcs[,-(1:2)] = allModelsResiduals
 
-# save phenofiles - all baseline for now - DS 2022-08-16
+# save phenofiles  
 write.table(baseline_full_res_agesexsite, file=paste0(outpath, '/', 'baseline_full_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
 write.table(baseline_full_res_agesex, file=paste0(outpath, '/', 'baseline_full_res_agesex.txt'), sep = "\t", row.names = FALSE)
 write.table(baseline_twins_res_agesexsite, file=paste0(outpath, '/', 'baseline_twins_res_agesexsite.txt'), sep = "\t", row.names = FALSE)
