@@ -1,13 +1,13 @@
 ################################
-
-# Create csv of cognition variables to use for FEMA
+# Create table of demographic information
 # Diana Smith
-# April 2022
+# October 2022
 
 rm(list=ls())
 ################################
 
-source('/home/d9smith/projects/random_effects/behavioral/scripts/create_phenofiles.R')
+setwd('/home/d9smith/projects/behav_genet_2022')
+source('create_phenofiles.R')
 library(tableone)
 
 catVars <- c("high.educ", "household.income")
