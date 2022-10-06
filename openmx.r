@@ -1,41 +1,40 @@
-# ------------------------------------------------------------------------------
-# Program: mulACEc.R  
-#  Author: Hermine Maes
-#    Date: 02 25 2016 
+################################################################################
+# OpenMx code for Model 1 
+# (ACE Model, baseline twins, residualized for age and sex)
 #
-# Twin Bivariate ACE model to estimate means and (co)variances across multiple groups
-# Matrix style model - Raw data - Continuous data
-# http://ibg.colorado.edu/cdrom2016/maes/MultivariateAnalysis/
-# -------|---------|---------|---------|---------|---------|---------|---------|
+# Diana Smith
+# Aug 2022
+#################################################################################
 
 rm(list=ls())
-# ------------------------------------------------------------------------------
+
 # # Load Libraries & Options
 library(OpenMx)
-
 library(R.matlab)
-source("/home/d9smith/projects/random_effects/behavioral/scripts/miFunctions2.R")
-source("/home/d9smith/projects/random_effects/behavioral/scripts/twin_functions.R")
 
+# set paths and source code
+setwd("/home/d9smith/projects/behav_genet_2022")
+source("miFunctions2.R")
+source("twin_functions.R")
+
+# Set path to directory where results will be saved
 outpath = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20220901"
-
-mxOption(NULL, "Default optimizer", 'SLSQP') # TODO - what does this do?
+mxOption(NULL, "Default optimizer", 'SLSQP') # Using default optimizer for OpenMx
 
 # Define the path to tge cmig_tools_utils/r directory
-funcpath <- '/home/d9smith/github/cmig_tools_internal/cmig_tools_utils/r'
+# Note: cmig_tools is available at: https://github.com/cmig-research-group/cmig_tools
+funcpath <- '/home/d9smith/github/cmig_tools/cmig_tools_utils/r'
 source(paste0(funcpath, '/', 'loadtxt.R'))
 
-# Load Data
+# Define paths to data files
 twin_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/twin_IDs_complete.txt"
 pheno_file = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/baseline_twins_res_agesex.txt"
-# pheno_file = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/twins_res_agesexsiteeducincpcs.txt" 
 
 zyg_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/ABCD_twins_all.txt"
-
 grm_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/twins_measured_grm.txt"
 
+# Load data
 twin = read.table(twin_file, header = T, sep = "\t")
-
 grm = read.table(grm_file,header = TRUE,sep=",")
 
 twin <- merge(twin, grm, by=c("IID1","IID2"))
@@ -51,9 +50,9 @@ names(pheno2)[-(1:2)] = paste0(names(pheno)[-(1:2)],2)
 df = merge(twin_complete, pheno2, by.x=c("IID2"), by.y=c("src_subject_id"))
 df = merge(df, pheno1, by.x=c("IID1", "eventname"), by.y=c("src_subject_id", "eventname"))
 
-# Note from DS 2022-08-24:
-# The resulting dataframe "df" contains 472 twin pairs, all with complete data for each twin. 
-# 271 DZ twin pairs, 201 MZ twin pairs.
+# Note from DS 2022-10-06:
+# The resulting dataframe "df" contains 699 twin pairs, all with complete data for each twin. 
+# 399 DZ twin pairs, 300 MZ twin pairs.
 
 # Monozygotic coded as 1, Dizygotic coded as 2
 df$zyg = NA
@@ -222,9 +221,9 @@ estHerit(df, 'nihtbx_fluidcomp_uncorrected', measured_grm=FALSE)
 estHerit(df, 'nihtbx_fluidcomp_uncorrected', measured_grm=TRUE)
 
 estHerit(df, 'nihtbx_cryst_uncorrected', measured_grm=FALSE)
-
 estHerit(df, 'nihtbx_cryst_uncorrected', measured_grm=TRUE)
-# Look at warning messages from OpenMx
+
+# create data frames for parameter estimates
 tasks = names(pheno)[-(1:2)]  
 
 A <- data.frame(
@@ -259,48 +258,8 @@ for (t in 1:length(tasks)){
   loglik[tasks==tasks[t], 'openmx_loglik'] = result$summary.Minus2LogLikelihood / (-2)
 }
 
-# save estimates to matlab file
-# writeMat(con = paste(outpath, "/", "openmx.mat", sep = ""), x = c(as.matrix(A), as.matrix(C), as.matrix(E), as.matrix(loglik)))
-
+# save estimates 
 write.csv(A, paste(outpath, "openmx_A.csv", sep = "/"), row.names=F)
 write.csv(C, paste(outpath, "openmx_C.csv", sep = "/"), row.names=F)
 write.csv(E, paste(outpath, "openmx_E.csv", sep = "/"), row.names=F)
 write.csv(loglik, paste(outpath, "openmx_loglik.csv", sep = "/"), row.names=F)
-
-## Unused code from Rob
-if (0) {
-
-  library(reshape)
-  library(psych)
-  library(Matrix)
-  library(stringi)
-  library('ggplot2')
-
-  A$task <- factor(A$task, levels = A$task)
-  ggplot(A[1:11,]) +
-      geom_bar( aes(x=task, y=openmx), stat="identity", fill="skyblue", alpha=0.7)+
-      geom_errorbar( aes(x=task, ymin=openmx_ci_lower, ymax=openmx_ci_upper), width=0.4, colour="orange", alpha=0.9, size=1.3) + 
-      theme(axis.text.x = element_text(angle = 45, hjust = 1), 
-          text = element_text(size=20)) + 
-      ylab('Heritability')
-
-  write.csv(A, '/home/rloughna/data/ABCD/heritability/twins/open_mx/herit_tlbx_residulised_with_CIs.csv',
-      row.names=F)
-
-  # Uncorrected
-  ACE = data.frame(task=tasks,E=E$openmx, C=C$openmx, A=A$openmx)
-  ACE$task <- factor(ACE$task, levels = ACE$task)
-  ACE = melt(ACE)
-  ggplot(ACE, aes(x=task, y=value, fill=variable)) +
-      geom_bar(stat="identity") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
-  #     geom_errorbar( aes(x=task, ymin=openmx_ci_lower, ymax=openmx_ci_upper), width=0.4, colour="orange", alpha=0.9, size=1.3) + 
-
-  # Residualised for covariates
-  ACE = data.frame(task=tasks,E=E$openmx, C=C$openmx, A=A$openmx)
-  ACE$task <- factor(ACE$task, levels = ACE$task)
-  ACE = melt(ACE)
-  ggplot(ACE, aes(x=task, y=value, fill=variable)) +
-      geom_bar(stat="identity") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
-  #
-
-}

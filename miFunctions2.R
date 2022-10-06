@@ -1,9 +1,10 @@
-# ------------------------------------------------------------------------------
+# ###########################################################################
+# This script is originally from:
 # Program: miFunctions2.R  
 #  Author: Hermine Maes
 #    Date: 02 25 2016 
 #
-# Set of my options & functions used in basic twin methodology scripts
+# Set of options & functions used in basic twin methodology scripts
 #   Email: hmaes@vcu.edu
 # -------|---------|---------|---------|---------|---------|---------|---------|
 

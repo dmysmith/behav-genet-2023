@@ -1,3 +1,7 @@
+###########################################################################
+# Twin helper functions to use with OpenMx
+# Created by Rob Loughnan
+
 #' Funciton residualise tasks
 #'
 #' - twins should be a table with columns 'IID1', 'IID2'and 'Zygosity'

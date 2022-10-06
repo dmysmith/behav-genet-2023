@@ -1,6 +1,6 @@
 ################################
 
-# Create csv of cognition variables to use for FEMA
+# Create csv of phenotypes of interest, including residualization
 # Diana Smith
 # April 2022
 
@@ -19,14 +19,22 @@ library(dplyr)
 # This section defines input and output paths for files and functions called. 
 
 # Define the path to the directory which contains the tabulated ABCD data 
-inpath <- '/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/tabulated/released'
-supportpath <- '/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/support_files/ABCD_rel4.0_unfiltered'
+inpath <- '/space/abcd-sync/4.0/tabulated/released'
+supportpath <- '/space/abcd-sync/4.0/support_files/ABCD_rel4.0_unfiltered'
 
 # Define the full path to the output RDS file 
 outpath <- '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno'
 
-# Define the path to tge cmig_tools_utils/r directory
-funcpath <- '/home/d9smith/github/cmig_tools_internal/cmig_tools_utils/r'
+################################
+# This code uses helper functions defined in the cmig_tools repo.
+# To clone the repo, use:
+# git clone https://github.com/cmig-research-group/cmig_tools.git
+
+funcpath <- '/home/d9smith/github/cmig_tools/cmig_tools_utils/r'
+
+source(paste0(funcpath, '/', 'loadtxt.R'))
+source(paste0(funcpath, '/', 'makeDEAPdemos.R'))
+
 # The functionmakeDEAPdemos.R requires the path to the directory which 
 # contains the tabulated ABCD data defined explicitly here
 deappath <- inpath
@@ -43,15 +51,6 @@ support_file <- paste0(supportpath, '/', support_file)
 lmt_file <- paste0(inpath, '/', lmt_file)
 # reasoning_file <- paste0(inpath, '/', reasoning_file)
 phys_file <- paste0(inpath, '/', phys_file)
-
-################################
-
-# R needs to parse two functions from cmig_utils/r. One is load.txt
-# to load the .txt files and remove unnecessary 2nd row, the other is 
-# makeDEAPdemos.R which collates SES variables into the format used by
-# DESP. 
-source(paste0(funcpath, '/', 'loadtxt.R'))
-source(paste0(funcpath, '/', 'makeDEAPdemos.R'))
 
 ################################
 # Load the support file
@@ -107,7 +106,7 @@ y2vars <- c('nihtbx_pattern_uncorrected','nihtbx_flanker_uncorrected','nihtbx_pi
 longitudinal <- fullmat[,c('src_subject_id','eventname',y2vars)]
 
 ################################
-# Save both "baseline" and "longitudinal" as RDS files 
+# Save both "baseline" and "longitudinal" as .txt files -- these are unadjusted which we do not use in the manuscript.
 
 if ( ! dir.exists(outpath) ) {
         dir.create(outpath, recursive=TRUE)
@@ -123,17 +122,8 @@ write.table(y2vars, file=paste0(outpath, '/', 'longitudinal_phenonames.txt'), se
 ################################
 # Create several residualized .csv files
 ################################
-# Create the SES variables as coded by DEAP
-# deap <- makeDEAPdemos(deappath)
-# deap <- deap[ , c("src_subject_id", "eventname", "sex", "interview_age", "high.educ", "household.income")]
-# Combine with the previously extracted variables
-# fullmat <- join(fullmat, deap, by=c('src_subject_id', 'eventname'))
 
-# genetic PCs subject data
-# pcfile <- '/space/gwas-syn2/1/data/GWAS/ABCD/genotype_proc/imputation/pop_struct_smokescreen/ABCD_20220428.updated.nodups.curated_pcair.tsv'
-# pc_mat <- read.delim(pcfile)
-# Get just the first 10 PCs and write to a dataframe  
-# pc <- data.frame(pc_mat[,c('X','C1','C2','C3','C4','C5', 'C6', 'C7', 'C8', 'C9', 'C10')])
+# Get just the first 10 genetic PCs and write to a dataframe  
 PCs <- c('PC1','PC2','PC3','PC4','PC5', 'PC6', 'PC7', 'PC8', 'PC9', 'PC10')
 # Combine with the physical health variables. 
 # fullmat <- join(fullmat, pc, by='src_subject_id', match = "all")
@@ -292,7 +282,7 @@ allModelsResults <- lapply(allModelsList, function(x) lm(x, data = longitudinal_
 allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = longitudinal_notwins)))  
 longitudinal_notwins_res_agesexprac[,-(1:2)] = allModelsResiduals
 
-# 13. y2_full_res_agesexsite
+# 13. y2_full_res_agesexsite - we did not use this in the paper
 y2_full = longitudinal_full[longitudinal_full$eventname=="2_year_follow_up_y_arm_1",]
 
 y2_full_res_agesexsite = y2_full[,c("src_subject_id", "eventname", y2vars)]
@@ -301,14 +291,14 @@ allModelsResults <- lapply(allModelsList, function(x) lm(x, data = y2_full, na.a
 allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = y2_full)))  
 y2_full_res_agesexsite[,-(1:2)] = allModelsResiduals
 
-# 13b. y2_full_res_agesex
+# 13b. y2_full_res_agesex - not used in the paper
 y2_full_res_agesex = y2_full[,c("src_subject_id", "eventname", y2vars)]
 allModelsList <- lapply(paste(y2vars, "~ interview_age + sex"), as.formula)
 allModelsResults <- lapply(allModelsList, function(x) lm(x, data = y2_full, na.action = na.exclude))
 allModelsResiduals <- lapply(allModelsList, function(x) residuals(lm(x, data = y2_full)))  
 y2_full_res_agesex[,-(1:2)] = allModelsResiduals
 
-# 14. y2_full_res_agesexsiteeducincpcs
+# 14. y2_full_res_agesexsiteeducincpcs - not used in the paper
 y2_full_res_agesexsiteeducincpcs = y2_full[,c("src_subject_id", "eventname", y2vars)]
 allModelsList <- lapply(paste(y2vars, "~ interview_age + sex + abcd_site + high.educ + household.income + PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10"), as.formula)
 allModelsResults <- lapply(allModelsList, function(x) lm(x, data = y2_full, na.action = na.exclude))
