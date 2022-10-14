@@ -90,18 +90,18 @@ fullmat <- fullmat[fullmat$anthroheightcalc >= 20 & fullmat$anthroheightcalc <= 
 
 ################################
 # Create dataframe "baseline" that includes all variables at baseline
-baselinevars <- c( "pea_wiscv_trs", "nihtbx_pattern_uncorrected", "nihtbx_flanker_uncorrected", 
-        "nihtbx_cardsort_uncorrected", "nihtbx_list_uncorrected", "nihtbx_picture_uncorrected", 
-        "nihtbx_picvocab_uncorrected", "nihtbx_reading_uncorrected", "nihtbx_cryst_uncorrected",
-        "nihtbx_fluidcomp_uncorrected", "nihtbx_totalcomp_uncorrected", "anthroheightcalc")        
+baselinevars <- c( "pea_wiscv_trs", "lmt_scr_perc_correct", "pea_ravlt_sd_trial_sum5trials", "nihtbx_pattern_uncorrected", 
+"nihtbx_flanker_uncorrected", "nihtbx_cardsort_uncorrected", "nihtbx_list_uncorrected", "nihtbx_picture_uncorrected", 
+"nihtbx_picvocab_uncorrected", "nihtbx_reading_uncorrected", "nihtbx_cryst_uncorrected", "nihtbx_fluidcomp_uncorrected", 
+"nihtbx_totalcomp_uncorrected", "anthroheightcalc")
 
 baseline <- fullmat[fullmat$eventname=='baseline_year_1_arm_1',c('src_subject_id','eventname',baselinevars)]
 
 
 ################################
 # Create dataframe "longitudinal" that includes baseline and year 2 for all variables with data
-y2vars <- c('nihtbx_pattern_uncorrected','nihtbx_flanker_uncorrected','nihtbx_picture_uncorrected',
-'nihtbx_picvocab_uncorrected','nihtbx_reading_uncorrected','nihtbx_cryst_uncorrected','anthroheightcalc')
+y2vars <- c("lmt_scr_perc_correct", "pea_ravlt_sd_trial_sum5trials", 'nihtbx_pattern_uncorrected','nihtbx_flanker_uncorrected',
+'nihtbx_picture_uncorrected','nihtbx_picvocab_uncorrected','nihtbx_reading_uncorrected','nihtbx_cryst_uncorrected','anthroheightcalc')
 
 longitudinal <- fullmat[,c('src_subject_id','eventname',y2vars)]
 
@@ -138,10 +138,10 @@ baseline_full = na.omit(fullmat[fullmat$eventname=='baseline_year_1_arm_1',c("sr
 longitudinal_full = na.omit(fullmat[,c("src_subject_id","eventname","rel_family_id", covariates, y2vars)])
 
 # create practice effect var for each y2 task
-longitudinal_full$prac = 1
+longitudinal_full$prac = 0
 dup_ids = longitudinal_full[duplicated(longitudinal_full$src_subject_id),'src_subject_id']
 idx = which(longitudinal_full$eventname=='2_year_follow_up_y_arm_1' & longitudinal_full$src_subject_id %in% dup_ids)
-longitudinal_full[idx,]$prac = 2
+longitudinal_full[idx,]$prac = 1
 
 # 1. baseline_full_res_agesexsite
 baseline_full_res_agesexsite = baseline_full[,c("src_subject_id", "eventname", baselinevars)]

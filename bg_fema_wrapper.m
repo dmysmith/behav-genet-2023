@@ -1,8 +1,10 @@
-%% Run FEMA for random effects project
+%% Run FEMA for behavior genetics paper 
 %% Diana Smith
 %% April 2022
 
 % ADD CMIG tools directory to MATLAB path:
+% Note that I used the internal repo (not the public one) 
+% because we added an option to use a maximum likelihood estimator.
 addpath(genpath('/home/d9smith/github/cmig_tools_internal'));
 
 % Specify data release
@@ -20,8 +22,8 @@ pheno_dir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/phe
 % Inputs that will remain the same for all models
 atlasVersion = 'ABCD2_cor10';
 dirname_tabulated = fullfile('/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/tabulated/released/'); %KNOWN ISSUE: breaks when using txt files following NDA release --> must use pre-release csv files
-fname_pregnancyID = fullfile('/home/sabad/requests/pregnancy_ID_07182022.csv');
-fname_addressID = fullfile('/home/sabad/requests/recent_addr_07182022.csv'); 
+% fname_pregnancyID = fullfile('/home/sabad/requests/pregnancy_ID_07182022.csv');
+% fname_addressID = fullfile('/home/sabad/requests/recent_addr_07182022.csv'); 
 fname_design = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/designMat/designMat0_empty.txt'; 
 
 contrasts=[]; % Contrasts relate to columns in design matrix e.g. [1 -1] will take the difference between cols 1 and 2 in your design matrix (X)
@@ -166,20 +168,20 @@ RandomEffects{i} = {'A';'F';'S';'E';}
 fname_pihat{i} = measured_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_notwins_res_agesexprac.txt');
 
-%% TEST MODELS
-i=17;
-fstem_imaging{i} = 'test_y2';
-titles{i} = 'ACE model, full sample at year 2 only, with GRM, age, sex';
-RandomEffects{i} = {'A';'F';'E'};
-fname_pihat{i} = measured_grm_file; 
-dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesex.txt');
+% %% TEST MODELS
+% i=17;
+% fstem_imaging{i} = 'test_y2';
+% titles{i} = 'ACE model, full sample at year 2 only, with GRM, age, sex';
+% RandomEffects{i} = {'A';'F';'E'};
+% fname_pihat{i} = measured_grm_file; 
+% dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesex.txt');
 
-i=18;
-fstem_imaging{i} = 'test_y2_allcovs';
-titles{i} = 'ACE model, full sample at year 2 only, measured GRM, all covariates';
-RandomEffects{i} = {'A';'F';'E'};
-fname_pihat{i} = measured_grm_file; 
-dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesexsiteeducincpcs.txt');
+% i=18;
+% fstem_imaging{i} = 'test_y2_allcovs';
+% titles{i} = 'ACE model, full sample at year 2 only, measured GRM, all covariates';
+% RandomEffects{i} = {'A';'F';'E'};
+% fname_pihat{i} = measured_grm_file; 
+% dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesexsiteeducincpcs.txt');
 
 save(strcat(dirname_out, '/', 'model_parameters.mat'), 'fstem_imaging', 'titles', 'RandomEffects');
 
@@ -212,65 +214,4 @@ for i = 1:length(fstem_imaging)
     fprintf(fid,jsonencode(sig2mat));  
     fclose(fid);
 
-end
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% extra code, no longer used
-if 0
-    % paste extra code here
-    % specify array of random effects
-    random_effects = {{'F','A','E'};{'F','A','T','E'};{'F','A','T','H','E'};{'F','A','T','S','E'};{'F','A','T','H','S','E'};
-    {'H','A','E'};{'H','A','T','E'};{'H','A','T','S','E'}};
-
-    % specify array of design 
-    % fname_design = '/home/d9smith/projects/random_effects/behavioral/designMat/designMat1_allcovs.txt'; % for debugging only
-    designmat_dir = '/home/d9smith/projects/random_effects/behavioral/designMat';
-    designmat_file = dir(sprintf('%s/designMat*.txt', designmat_dir));
-    designmat_file = {designmat_file.name}';
-    designmat_array = strcat(designmat_dir, '/', designmat_file);
-
-    % when only running one model
-    %fname_design = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/designMat/designMat0_empty.txt' % baseline only
-    fname_design = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/designMat/designMat1_allcovs.txt'
-    RandomEffects = {'F';'A';'S';'T';'E'};
-    dirname_imaging = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/baseline_twins_res_agesexsite.txt'; 
-    fstem_imaging = sprintf('%s',RandomEffects{:});
-    dirname_out = strcat(outDir, '/',dirname_imaging(71:end-4)); % when looping through design matrices
-    % dirname_out = strcat(outDir, '/',fname_design(1:-4)); % when only using one design matrix
-    disp(dirname_out);
-
-    % loop through each design matrix
-    for i = 1:numel(designmat_array)
-        fname_design = designmat_array(i);
-    %% loop through each set of random effects
-        for j = 1:numel(random_effects)     
-            % define dynamic inputs
-            fstem_imaging = sprintf('%s',random_effects{j}{:});
-            dirname_out = strcat(outDir, '/',designmat_file{i}(1:end-4)); % when looping through design matrices
-            % dirname_out = strcat(outDir, '/',fname_design(1:-4)); % when only using one design matrix
-            disp(dirname_out);
-            RandomEffects = random_effects{j};
-            disp(RandomEffects);
- 
-            % for models including S, we want to use the longitudinal outcome data, otherwise only baseline
-            if any(strcmp(random_effects{j},'S'))
-                dirname_imaging = dirname_imaging_longitudinal;
-            else
-                dirname_imaging = dirname_imaging_baseline;
-            end
-            
-            % run FEMA
-            [fnames_out beta_hat beta_se zmat logpmat sig2tvec sig2mat beta_hat_perm beta_se_perm zmat_perm sig2tvec_perm sig2mat_perm inputs mask tfce_perm colnames_interest save_params logLikvec Hessmat] = FEMA_wrapper(fstem_imaging, fname_design, dirname_out, dirname_tabulated, dirname_imaging, datatype,...
-            'ranknorm', ranknorm, 'contrasts', contrasts, 'RandomEffects', RandomEffects, 'pihat_file', fname_pihat, 'nperms', nperms, 'mediation',mediation,'PermType',PermType,'tfce',tfce,'preg_file',fname_pregnancyID,'address_file',fname_addressID,...
-            'Hessflag',Hessflag,'ciflag',ciflag,'logLikflag',logLikflag,'RandomEstType',RandomEstType);
-            
-            % save sig2mat_perm as output
-            save(fnames_out{:}, 'sig2mat_perm', '-append');
-            save(fnames_out{:}, 'logLikvec_perm', '-append');
-            %writematrix(sig2mat_perm, sprintf('%s_sig2mat_perm.csv',fnames_out{:}(1:end-4)))
-            writematrix(sig2mat,sprintf('%s/sig2mat_%s.csv',dirname_out,[random_effects{j}{:}]));
-        end
-    end
 end
