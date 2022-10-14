@@ -77,111 +77,57 @@ estHerit <- function(data, task, measured_grm=FALSE){
   dzData    <- subset(data, zyg==2, selVars)
   nl        <- subset(data, select=c('measured_grm', selVars))
 
-  if (measured_grm == TRUE) {
+  # Set Starting Values
+  svMe      <- rnorm(1)                       # start value for means
+  svPa      <- .4                        # start value for path coefficient
+  svPe      <- .6                        # start value for path coefficient for e
+  lbPa      <- .0001      
+  # ACE Model
+  # Create Algebra for expected Mean Matrices
+  meanG     <- mxMatrix( type="Full", nrow=1, ncol=ntv, free=TRUE, values=svMe, labels=task, name="meanG" )
 
-    # Set Starting Values
-    sMu      <- 0                        # start value for means
-    sVa      <- .2                       # start value for A
-    sVc      <- .2                       # start value for C
-    sVe      <- .6                       # start value for E
+  # Create Matrices for Path Coefficients
+  pathA     <- mxMatrix( type="Lower", nrow=nv, ncol=nv, free=TRUE, values=svPa, label="a11", lbound=lbPa, name="a" ) 
+  pathC     <- mxMatrix( type="Lower", nrow=nv, ncol=nv, free=TRUE, values=svPa, label="c11", lbound=lbPa, name="c" )
+  pathE     <- mxMatrix( type="Lower", nrow=nv, ncol=nv, free=TRUE, values=svPe, label="e11", lbound=lbPa, name="e" )
 
-    # ----------------------------------------------------------------------------------------------------------------------
-    # PREPARE MODEL
+  # Create Algebra for Variance Components
+  covA      <- mxAlgebra( expression=a %*% t(a), name="A" )
+  covC      <- mxAlgebra( expression=c %*% t(c), name="C" ) 
+  covE      <- mxAlgebra( expression=e %*% t(e), name="E" )
 
-    # Create Algebra for expected Mean Matrices
-    intercept     <- mxMatrix( type="Full", nrow=1, ncol=ntv, free=TRUE, values=sMu, labels=task, name="intercept" )
-    expMean       <- mxAlgebra(expression = intercept, name="expMean" )
+  # Create Algebra for expected Variance/Covariance Matrices in MZ & DZ twins
+  covP      <- mxAlgebra( expression= A+C+E, name="V" )
+  covMZ     <- mxAlgebra( expression= A+C, name="cMZ" )
+  covDZ     <- mxAlgebra( expression= 0.5%x%A+ C, name="cDZ" )
+  expCovMZ  <- mxAlgebra( expression= rbind( cbind(V, cMZ), cbind(t(cMZ), V)), name="expCovMZ" )
+  expCovDZ  <- mxAlgebra( expression= rbind( cbind(V, cDZ), cbind(t(cDZ), V)), name="expCovDZ" )
 
-    # Create Matrices for Variance Components
-    covA      <- mxMatrix( type="Symm", nrow=nv, ncol=nv, free=TRUE, values=sVa, label="VA11", name="A" ) 
-    covC      <- mxMatrix( type="Symm", nrow=nv, ncol=nv, free=TRUE, values=sVc, label="VC11", name="C" )
-    covE      <- mxMatrix( type="Symm", nrow=nv, ncol=nv, free=TRUE, values=sVe, label="VE11", name="E" )
+  # Create Data Objects for Multiple Groups
+  dataMZ    <- mxData( observed=mzData, type="raw" )
+  dataDZ    <- mxData( observed=dzData, type="raw" )
 
-    # Create Algebra for expected Variance/Covariance Matrices in MZ & DZ twins
-    covP      <- mxAlgebra( expression= A+C+E, name="V" )
-    relA      <- mxMatrix( type="Stand", nrow=nt, ncol=nt, free=FALSE, labels="measured_grm", name="rA" ) 
-    relC      <- mxMatrix( type="Unit", nrow=nt, ncol=nt, free=FALSE, name="rC" ) 
-    relE      <- mxMatrix( type="Iden", nrow=nt, ncol=nt, free=FALSE, name="rE" ) 
+  # Create Expectation Objects for Multiple Groups
+  expMZ     <- mxExpectationNormal( covariance="expCovMZ", means="meanG", dimnames=selVars )
+  expDZ     <- mxExpectationNormal( covariance="expCovDZ", means="meanG", dimnames=selVars )
+  funML     <- mxFitFunctionML()
 
-    expCov   <- mxAlgebra( expression= rA%x%A + rC%x%C + rE%x%E, name="expCov" )
+  # Create Model Objects for Multiple Groups
+  pars      <- list(meanG, pathA, pathC, pathE, covA, covC, covE, covP)
+  modelMZ   <- mxModel( name="MZ", pars, covMZ, expCovMZ, dataMZ, expMZ, funML )
+  modelDZ   <- mxModel( name="DZ", pars, covDZ, expCovDZ, dataDZ, expDZ, funML )
+  multi     <- mxFitFunctionMultigroup( c("MZ","DZ") )
 
-    # Create Data Objects for Multiple Groups
-    dataTW    <- mxData( observed=nl, type="raw" )
+  # Create Algebra for Variance Components
+  rowVC     <- rep('VC',nv)
+  colVC     <- rep(c('A','C','E','SA','SC','SE', 'SV'),each=nv)
+  estVC     <- mxAlgebra( expression=cbind(A,C,E,A/V,C/V,E/V,V), name="VC", dimnames=list(rowVC,colVC))
 
-    # Create Expectation Objects for Multiple Groups
-    expTW     <- mxExpectationNormal(covariance="expCov", means="intercept", dimnames=selVars )
-    funML     <- mxFitFunctionML()
+  # Create Confidence Interval Objects
+  ciACE     <- mxCI( "VC[1,1:7]" )
 
-    # Create Model Objects for Multiple Groups
-    # defs      <- list(defAge, defSex, relA)
-    # pars      <- list( intercept, betaS, betaA, covA, covC, covE, covP, relC, relE)
-    defs      <- list(relA)
-    pars      <- list(intercept, covA, covC, covE, covP, relC, relE)
-
-    # Create Algebra for Variance Components
-    rowVC     <- rep('VC',nv)
-    colVC     <- rep(c('A','C','E','SA','SC','SE'),each=nv)
-    estVC     <- mxAlgebra( expression=cbind(A,C,E,A/V,C/V,E/V), name="VC", dimnames=list(rowVC,colVC) )
-
-    # Create Confidence Interval Objects
-    ciACE     <- mxCI( "VC[1,1:6]" )
-
-    # Build Model with Confidence Intervals
-    modelACE   <- mxModel( "oneACEc", defs, pars, expMean, expCov, dataTW, expTW, funML, estVC, ciACE )
-
-} else {
-    # Set Starting Values
-    svMe      <- rnorm(1)                       # start value for means
-    svPa      <- .4                        # start value for path coefficient
-    svPe      <- .6                        # start value for path coefficient for e
-    lbPa      <- .0001      
-    # ACE Model
-    # Create Algebra for expected Mean Matrices
-    meanG     <- mxMatrix( type="Full", nrow=1, ncol=ntv, free=TRUE, values=svMe, labels=task, name="meanG" )
-
-    # Create Matrices for Path Coefficients
-    pathA     <- mxMatrix( type="Lower", nrow=nv, ncol=nv, free=TRUE, values=svPa, label="a11", lbound=lbPa, name="a" ) 
-    pathC     <- mxMatrix( type="Lower", nrow=nv, ncol=nv, free=TRUE, values=svPa, label="c11", lbound=lbPa, name="c" )
-    pathE     <- mxMatrix( type="Lower", nrow=nv, ncol=nv, free=TRUE, values=svPe, label="e11", lbound=lbPa, name="e" )
-
-    # Create Algebra for Variance Components
-    covA      <- mxAlgebra( expression=a %*% t(a), name="A" )
-    covC      <- mxAlgebra( expression=c %*% t(c), name="C" ) 
-    covE      <- mxAlgebra( expression=e %*% t(e), name="E" )
-
-    # Create Algebra for expected Variance/Covariance Matrices in MZ & DZ twins
-    covP      <- mxAlgebra( expression= A+C+E, name="V" )
-    covMZ     <- mxAlgebra( expression= A+C, name="cMZ" )
-    covDZ     <- mxAlgebra( expression= 0.5%x%A+ C, name="cDZ" )
-    expCovMZ  <- mxAlgebra( expression= rbind( cbind(V, cMZ), cbind(t(cMZ), V)), name="expCovMZ" )
-    expCovDZ  <- mxAlgebra( expression= rbind( cbind(V, cDZ), cbind(t(cDZ), V)), name="expCovDZ" )
-
-    # Create Data Objects for Multiple Groups
-    dataMZ    <- mxData( observed=mzData, type="raw" )
-    dataDZ    <- mxData( observed=dzData, type="raw" )
-
-    # Create Expectation Objects for Multiple Groups
-    expMZ     <- mxExpectationNormal( covariance="expCovMZ", means="meanG", dimnames=selVars )
-    expDZ     <- mxExpectationNormal( covariance="expCovDZ", means="meanG", dimnames=selVars )
-    funML     <- mxFitFunctionML()
-
-    # Create Model Objects for Multiple Groups
-    pars      <- list(meanG, pathA, pathC, pathE, covA, covC, covE, covP)
-    modelMZ   <- mxModel( name="MZ", pars, covMZ, expCovMZ, dataMZ, expMZ, funML )
-    modelDZ   <- mxModel( name="DZ", pars, covDZ, expCovDZ, dataDZ, expDZ, funML )
-    multi     <- mxFitFunctionMultigroup( c("MZ","DZ") )
-
-    # Create Algebra for Variance Components
-    rowVC     <- rep('VC',nv)
-    colVC     <- rep(c('A','C','E','SA','SC','SE', 'SV'),each=nv)
-    estVC     <- mxAlgebra( expression=cbind(A,C,E,A/V,C/V,E/V,V), name="VC", dimnames=list(rowVC,colVC))
-
-    # Create Confidence Interval Objects
-    ciACE     <- mxCI( "VC[1,1:7]" )
-
-    # Build Model with Confidence Intervals
-    modelACE  <- mxModel( "oneACEc", pars, modelMZ, modelDZ, multi, estVC, ciACE )  
-  }
+  # Build Model with Confidence Intervals
+  modelACE  <- mxModel( "oneACEc", pars, modelMZ, modelDZ, multi, estVC, ciACE )  
   # ------------------------------------------------------------------------------
   # RUN MODEL
 
@@ -210,18 +156,20 @@ estHerit <- function(data, task, measured_grm=FALSE){
     row.names=c('left', 'right')
   )
   
+  status <- mxCheckIdentification(modelACE)$status
+  non_identified_parameters <- mxCheckIdentification(modelACE)$non_identified_parameters 
+
   c(a2=as.numeric(a2), 
     c2=as.numeric(c2),
     e2=as.numeric(e2),
     CI=CI,
-    falkoner=2*(r_mz-r_dz), summary=sumACE)
+    falkoner=2*(r_mz-r_dz), summary=sumACE,
+    status=status,
+    non_identified_parameters=non_identified_parameters)
 }
 
 estHerit(df, 'nihtbx_fluidcomp_uncorrected', measured_grm=FALSE)
-estHerit(df, 'nihtbx_fluidcomp_uncorrected', measured_grm=TRUE)
-
 estHerit(df, 'nihtbx_cryst_uncorrected', measured_grm=FALSE)
-estHerit(df, 'nihtbx_cryst_uncorrected', measured_grm=TRUE)
 
 # create data frames for parameter estimates
 tasks = names(pheno)[-(1:2)]  
@@ -237,6 +185,14 @@ E <- data.frame(
 )
 
 loglik <- data.frame(
+  task=tasks
+)
+
+status <- data.frame(
+  task=tasks
+)
+
+non_identified_parameters <- data.frame(
   task=tasks
 )
 
@@ -256,6 +212,10 @@ for (t in 1:length(tasks)){
 
   # log likelihood
   loglik[tasks==tasks[t], 'openmx_loglik'] = result$summary.Minus2LogLikelihood / (-2)
+
+  # assessing model fit
+  status[tasks==tasks[t], 'status'] = result$status[1]
+  non_identified_parameters[tasks==tasks[t], 'non_identified_parameters'] = result$non_identified_parameters[1]
 }
 
 # save estimates 
@@ -263,3 +223,11 @@ write.csv(A, paste(outpath, "openmx_A.csv", sep = "/"), row.names=F)
 write.csv(C, paste(outpath, "openmx_C.csv", sep = "/"), row.names=F)
 write.csv(E, paste(outpath, "openmx_E.csv", sep = "/"), row.names=F)
 write.csv(loglik, paste(outpath, "openmx_loglik.csv", sep = "/"), row.names=F)
+
+# result <- estHerit(df, 'anthroheightcalc', measured_grm=FALSE)
+
+# For the following tasks: nihtbx_pattern_uncorrected, nihtbx_reading_uncorrected,  
+# Received this warning message:
+
+# In model 'oneACEc' Optimizer returned a non-zero status code 5. The Hessian at the solution does not appear to be convex. 
+# See ?mxCheckIdentification for possible diagnosis (Mx status RED). 
