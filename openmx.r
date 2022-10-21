@@ -79,8 +79,8 @@ estHerit <- function(data, task, measured_grm=FALSE){
 
   # Set Starting Values
   svMe      <- rnorm(1)                       # start value for means
-  svPa      <- .4                        # start value for path coefficient
-  svPe      <- .6                        # start value for path coefficient for e
+  svPa      <- .3                        # start value for path coefficient
+  svPe      <- .7                        # start value for path coefficient for e
   lbPa      <- .0001      
   # ACE Model
   # Create Algebra for expected Mean Matrices
@@ -224,9 +224,15 @@ write.csv(C, paste(outpath, "openmx_C.csv", sep = "/"), row.names=F)
 write.csv(E, paste(outpath, "openmx_E.csv", sep = "/"), row.names=F)
 write.csv(loglik, paste(outpath, "openmx_loglik.csv", sep = "/"), row.names=F)
 
-# result <- estHerit(df, 'anthroheightcalc', measured_grm=FALSE)
+result <- estHerit(df, 'anthroheightcalc', measured_grm=FALSE)
 
-# For the following tasks: nihtbx_pattern_uncorrected, nihtbx_reading_uncorrected,  
+#  [1] "pea_wiscv_trs"                 "lmt_scr_perc_correct"          "pea_ravlt_sd_trial_sum5trials"
+#  [4] "nihtbx_pattern_uncorrected"    "nihtbx_flanker_uncorrected"    "nihtbx_cardsort_uncorrected"  
+#  [7] "nihtbx_list_uncorrected"       "nihtbx_picture_uncorrected"    "nihtbx_picvocab_uncorrected"  
+# [10] "nihtbx_reading_uncorrected"    "nihtbx_cryst_uncorrected"      "nihtbx_fluidcomp_uncorrected" 
+# [13] "nihtbx_totalcomp_uncorrected"  "anthroheightcalc" 
+
+# For the following tasks: nihtbx_cryst_uncorrected, nihtbx_pattern_uncorrected, nihtbx_reading_uncorrected,  
 # Received this warning message:
 
 # In model 'oneACEc' Optimizer returned a non-zero status code 5. The Hessian at the solution does not appear to be convex. 

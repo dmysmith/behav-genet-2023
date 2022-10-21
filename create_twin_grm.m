@@ -72,4 +72,4 @@ for grmi = 1:size(GRM_notwin,1)
     GRM_notwin(grmi,grmi) = NaN;
 end
 
-disp(sum(GRM_notwin(:) >= 0.9));
+disp(sum(GRM_notwin(:) >= 0.9) / 2);
