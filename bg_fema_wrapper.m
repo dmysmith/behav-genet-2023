@@ -5,13 +5,14 @@
 % ADD CMIG tools directory to MATLAB path:
 % Note that I used the internal repo (not the public one) 
 % because we added an option to use a maximum likelihood estimator.
-addpath(genpath('/home/d9smith/github/cmig_tools_internal'));
+% addpath(genpath('/home/d9smith/github/cmig_tools_internal'));
+addpath(genpath('/home/dale/matlab/FEMA'));
 
 % Specify data release
 dataRelease = '4.0';
 
 % Path to store results
-dirname_out = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20220901';
+dirname_out = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20230107';
 
 % paths to inputs
 measured_grm_file = fullfile('/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/genomics/ABCD_rel4.0_grm.mat');
@@ -30,7 +31,7 @@ contrasts=[]; % Contrasts relate to columns in design matrix e.g. [1 -1] will ta
 ranknorm = 0; % Rank normalizes dependent variables (Y) (default = 0)
 nperms = 0; % Number of permutations - set to 0 for now
 mediation = 0; % If wanting to use outputs for a mediation analysis set mediation=1 - ensures same resampling scheme used for each model in fname_design
-PermType = 'wildbootstrap'; %Default resampling method is null wild-bootstrap - to run mediation analysis need to use non-null wild-bootstrap ('wildboostrap-nn')
+PermType = 'wildbootstrap-nn'; %Default resampling method is null wild-bootstrap - to run mediation analysis need to use non-null wild-bootstrap ('wildboostrap-nn')
 tfce = 0; % Columns in design matrix to loop over to calculate TFCE - selecting columns of interest improves efficiency - is `isempty(tfce_cols)` FEMA_wrapper will NOT run TFCE
 RandomEstType = 'ML'; % specify random effects estimator (default is MoM)
 Hessflag=0;
@@ -135,7 +136,7 @@ fstem_imaging{i} = 's2_allcovs_m3';
 titles{i} = 'ACE Model, full sample, baseline, measured GRM, all covariates';
 RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = measured_grm_file;
-dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
+dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsiteeducincpcs.txt');
 
 i=13;
 fstem_imaging{i} = 's2_allcovs_m4';
@@ -168,20 +169,60 @@ RandomEffects{i} = {'A';'F';'S';'E';}
 fname_pihat{i} = measured_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_notwins_res_agesexprac.txt');
 
-% %% TEST MODELS
-% i=17;
-% fstem_imaging{i} = 'test_y2';
-% titles{i} = 'ACE model, full sample at year 2 only, with GRM, age, sex';
-% RandomEffects{i} = {'A';'F';'E'};
-% fname_pihat{i} = measured_grm_file; 
-% dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesex.txt');
+if 0
+  %% Side Question #4: What is the deal with confidence intervals?
+  nperms = 1000;
 
-% i=18;
-% fstem_imaging{i} = 'test_y2_allcovs';
-% titles{i} = 'ACE model, full sample at year 2 only, measured GRM, all covariates';
-% RandomEffects{i} = {'A';'F';'E'};
-% fname_pihat{i} = measured_grm_file; 
-% dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesexsiteeducincpcs.txt');
+  i=17;
+  fstem_imaging{i} = 's4_1000perms_model1';
+  titles{i} = 'FEMA ACE Model, twins only, baseline, assigned GRM, 1000 permutations';
+  RandomEffects{i} = {'A';'F';'E'}; 
+  fname_pihat{i} = twin_grm_file; 
+  dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesex.txt');
+
+  i=18;
+  fstem_imaging{i} = 's4_1000perms_model2';
+  titles{i} =  'ACE Model, twins only, baseline, measured GRM, 1000 permutations';
+  RandomEffects{i} = {'A';'F';'E'};
+  fname_pihat{i} = measured_grm_file;
+  dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesex.txt'); 
+
+  i=19;
+  fstem_imaging{i} = 's4_1000perms_model3';
+  titles{i} = 'ACE Model, full sample, baseline, measured GRM, 1000 permutations';
+  RandomEffects{i} = {'A';'F';'E'};
+  fname_pihat{i} = measured_grm_file;
+  dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesex.txt');  
+
+  i=20;
+  fstem_imaging{i} = 's4_1000perms_model4';
+  titles{i} = 'ACTE Model, full sample, baseline, measured GRM, 1000 permutations';
+  RandomEffects{i} = {'A';'F';'T';'E'};
+  fname_pihat{i} = measured_grm_file;
+  dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesex.txt'); 
+
+  % Note that all longitudinal analyses should include data that is preresidualized for age, sex, site, and practice effect.
+  i=21;
+  fstem_imaging{i} = 's4_1000perms_model6';
+  titles{i} = 'ACTSE Model, full sample, baseline and Y2, measured GRM, 1000 permutations';
+  RandomEffects{i} = {'A';'F';'T';'S';'E'};
+  fname_pihat{i} = measured_grm_file;
+  dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexprac.txt');   
+
+  % i=17;
+  % fstem_imaging{i} = 'test_y2';
+  % titles{i} = 'ACE model, full sample at year 2 only, with GRM, age, sex';
+  % RandomEffects{i} = {'A';'F';'E'};
+  % fname_pihat{i} = measured_grm_file; 
+  % dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesex.txt');
+
+  % i=18;
+  % fstem_imaging{i} = 'test_y2_allcovs';
+  % titles{i} = 'ACE model, full sample at year 2 only, measured GRM, all covariates';
+  % RandomEffects{i} = {'A';'F';'E'};
+  % fname_pihat{i} = measured_grm_file; 
+  % dirname_imaging{i} = strcat(pheno_dir,'/','y2_full_res_agesexsiteeducincpcs.txt')d;
+end
 
 save(strcat(dirname_out, '/', 'model_parameters.mat'), 'fstem_imaging', 'titles', 'RandomEffects');
 

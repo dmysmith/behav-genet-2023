@@ -18,7 +18,7 @@ source("miFunctions2.R")
 source("twin_functions.R")
 
 # Set path to directory where results will be saved
-outpath = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20220901"
+outpath = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20230107"
 mxOption(NULL, "Default optimizer", 'SLSQP') # Using default optimizer for OpenMx
 
 # Define the path to tge cmig_tools_utils/r directory
@@ -78,10 +78,10 @@ estHerit <- function(data, task, measured_grm=FALSE){
   nl        <- subset(data, select=c('measured_grm', selVars))
 
   # Set Starting Values
-  svMe      <- rnorm(1)                       # start value for means
-  svPa      <- .3                        # start value for path coefficient
-  svPe      <- .7                        # start value for path coefficient for e
-  lbPa      <- .0001      
+  svMe      <- 0                      # start value for means
+  svPa      <- .2                        # start value for path coefficient
+  svPe      <- .8                        # start value for path coefficient for e
+  lbPa      <- .00001      
   # ACE Model
   # Create Algebra for expected Mean Matrices
   meanG     <- mxMatrix( type="Full", nrow=1, ncol=ntv, free=TRUE, values=svMe, labels=task, name="meanG" )
@@ -224,7 +224,7 @@ write.csv(C, paste(outpath, "openmx_C.csv", sep = "/"), row.names=F)
 write.csv(E, paste(outpath, "openmx_E.csv", sep = "/"), row.names=F)
 write.csv(loglik, paste(outpath, "openmx_loglik.csv", sep = "/"), row.names=F)
 
-result <- estHerit(df, 'anthroheightcalc', measured_grm=FALSE)
+result <- estHerit(df, 'nihtbx_pattern_uncorrected', measured_grm=FALSE)
 
 #  [1] "pea_wiscv_trs"                 "lmt_scr_perc_correct"          "pea_ravlt_sd_trial_sum5trials"
 #  [4] "nihtbx_pattern_uncorrected"    "nihtbx_flanker_uncorrected"    "nihtbx_cardsort_uncorrected"  
