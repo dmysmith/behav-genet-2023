@@ -11,7 +11,7 @@ addpath(genpath('/home/d9smith/github/cmig_tools/cmig_tools_utils/matlab'));
 addpath(genpath('/home/d9smith/.matlab'));
 
 % Load full GRM file
-grm_file = '/space/abcd-sync/4.0/genomics/ABCD_rel4.0_grm.mat';
+grm_file = '/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/genomics/ABCD_rel4.0_grm.mat';
 load(grm_file);
 
 % load twin ID list
@@ -73,3 +73,27 @@ for grmi = 1:size(GRM_notwin,1)
 end
 
 disp(sum(GRM_notwin(:) >= 0.9) / 2);
+
+% how many MZ and DZ twins in the full sample?
+
+% load baseline full file
+baseline_file = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/baseline_full_res_agesex.txt";
+baseline = readtable(baseline_file);
+baseline = baseline(:,["src_subject_id"]);
+
+% make new GRM matrix only for participants in baseline full sample
+baseline_sample_GRM = GRM_old; 
+for i = 1:size(iid_list,1)
+    if ~any(strcmp(baseline{:,1},iid_list{i,1}))
+        baseline_sample_GRM(i,:) = NaN;
+        baseline_sample_GRM(:,i) = NaN;
+    end
+end
+
+% remove diagonal
+for grmi = 1:size(baseline_sample_GRM,1)
+    baseline_sample_GRM(grmi,grmi) = NaN;
+end
+
+% count everyone with relatedness >0.9
+disp(sum(baseline_sample_GRM(:) >= 0.9) / 2);

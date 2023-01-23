@@ -19,8 +19,11 @@ library(dplyr)
 # This section defines input and output paths for files and functions called. 
 
 # Define the path to the directory which contains the tabulated ABCD data 
-inpath <- '/space/abcd-sync/4.0/tabulated/released'
-supportpath <- '/space/abcd-sync/4.0/support_files/ABCD_rel4.0_unfiltered'
+# inpath <- '/space/abcd-sync/4.0/tabulated/released'
+# supportpath <- '/space/abcd-sync/4.0/support_files/ABCD_rel4.0_unfiltered'
+
+inpath <- '/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/tabulated/released' 
+supportpath <- '/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/support_files/ABCD_rel4.0_unfiltered'
 
 # Define the full path to the output RDS file 
 outpath <- '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno'
