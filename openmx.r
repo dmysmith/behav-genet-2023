@@ -13,12 +13,12 @@ library(OpenMx)
 library(R.matlab)
 
 # set paths and source code
-setwd("/home/d9smith/projects/behav_genet_2022")
+setwd("/home/d9smith/projects/behav_genet_2023")
 source("miFunctions2.R")
 source("twin_functions.R")
 
 # Set path to directory where results will be saved
-outpath = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20230107"
+outpath = "/space/syn50/1/data/ABCD/d9smith/behav_genet_2023/results_20230227"
 mxOption(NULL, "Default optimizer", 'SLSQP') # Using default optimizer for OpenMx
 
 # Define the path to tge cmig_tools_utils/r directory
@@ -27,11 +27,11 @@ funcpath <- '/home/d9smith/github/cmig_tools/cmig_tools_utils/r'
 source(paste0(funcpath, '/', 'loadtxt.R'))
 
 # Define paths to data files
-twin_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/twin_IDs_complete.txt"
-pheno_file = "/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno/baseline_twins_res_agesex.txt"
+twin_file = "/home/d9smith/projects/behav_genet_2023/twinfiles/twin_IDs_complete.txt"
+pheno_file = "/space/syn50/1/data/ABCD/d9smith/behav_genet_2023/data/pheno/baseline_twins_res_agesex.txt"
 
-zyg_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/ABCD_twins_all.txt"
-grm_file = "/home/d9smith/projects/random_effects/behavioral/twinfiles/twins_measured_grm.txt"
+zyg_file = "/home/d9smith/projects/behav_genet_2023/twinfiles/ABCD_twins_all.txt"
+grm_file = "/home/d9smith/projects/behav_genet_2023/twinfiles/twins_measured_grm.txt"
 
 # Load data
 twin = read.table(twin_file, header = T, sep = "\t")

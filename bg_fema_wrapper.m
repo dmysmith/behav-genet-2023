@@ -5,27 +5,27 @@
 % ADD CMIG tools directory to MATLAB path:
 % Note that I used the internal repo (not the public one) 
 % because we added an option to use a maximum likelihood estimator.
-addpath(genpath('/home/d9smith/github/cmig_tools_internal'));
-% addpath(genpath('/home/dale/matlab/FEMA'));
+% addpath(genpath('/home/d9smith/github/cmig_tools_internal'));
+addpath(genpath('/home/d9smith/github/cmig_tools'));
 
 % Specify data release
 dataRelease = '4.0';
 
 % Path to store results
-dirname_out = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/results/results_20230107';
+dirname_out = '/space/syn50/1/data/ABCD/d9smith/behav_genet_2023/results_20230227';
 
 % paths to inputs
 measured_grm_file = fullfile('/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/genomics/ABCD_rel4.0_grm.mat');
-assigned_grm_file = fullfile('/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/all_discrete_grm.mat');
-twin_grm_file = fullfile('/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/twins_assigned_grm.mat');
-pheno_dir = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/data/pheno';
+assigned_grm_file = fullfile('/space/syn50/1/data/ABCD/d9smith/behav_genet_2023/data/all_discrete_grm.mat');
+twin_grm_file = fullfile('/space/syn50/1/data/ABCD/d9smith/behav_genet_2023/data/twins_assigned_grm.mat');
+pheno_dir = '/space/syn50/1/data/ABCD/d9smith/behav_genet_2023/data/pheno';
 
 % Inputs that will remain the same for all models
 atlasVersion = 'ABCD2_cor10';
 dirname_tabulated = fullfile('/space/amdale/1/tmp/ABCD_cache/abcd-sync/4.0/tabulated/released/'); %KNOWN ISSUE: breaks when using txt files following NDA release --> must use pre-release csv files
 fname_pregnancyID = fullfile('/home/sabad/requests/pregnancy_ID_01172023.csv');
 fname_addressID = fullfile('/home/sabad/requests/recent_addr_07182022.csv'); 
-fname_design = '/space/syn50/1/data/ABCD/d9smith/random_effects/behavioral/designMat/designMat0_empty.txt'; 
+fname_design = '/space/syn50/1/data/ABCD/d9smith/behav_genet_2023/designMat/designMat0_empty.txt'; 
 
 contrasts=[]; % Contrasts relate to columns in design matrix e.g. [1 -1] will take the difference between cols 1 and 2 in your design matrix (X)
 ranknorm = 0; % Rank normalizes dependent variables (Y) (default = 0)
@@ -41,7 +41,7 @@ datatype='external'; % can use txt with columns of ANY data type (e.g. ROIs, beh
 
 fstem_imaging = {}; RandomEffects = {}; fname_pihat = {}; dirname_imaging = {}; titles = {};
 
-%% Model 1: ACE Model, twins only at baseline, genetic relatedness assumed (will also run in OpenMx)
+%% Model 1 (Figure 1): ACE Model, twins only at baseline, genetic relatedness assumed (will also run in OpenMx)
 i=1;
 fstem_imaging{i} = 'model1';
 titles{i} = 'FEMA ACE Model, twin sample, baseline, kinship-derived GRM';
@@ -49,7 +49,7 @@ RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = twin_grm_file; 
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesex.txt');
 
-%% Model 2: ACE Model, twins only at baseline, with GRM included.
+%% Model 2 (Figure 2): ACE Model, twins only at baseline, with GRM included.
 i=2;
 fstem_imaging{i} = 'model2';
 titles{i} =  'ACE Model, twin sample, baseline, SNP-derived GRM';
@@ -57,7 +57,7 @@ RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesex.txt'); 
 
-%% Model 3: ACE Model, full sample at baseline, with GRM included within family.
+%% Model 3 (Figure 3): ACE Model, full sample at baseline, with GRM included within family.
 i=3;
 fstem_imaging{i} = 'model3';
 titles{i} = 'ACE Model, full sample, baseline, SNP-derived GRM';
@@ -65,7 +65,7 @@ RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesex.txt');  
 
-%% Model 4: ACTE Model, full sample at baseline, with GRM within family.
+%% Model 4 (Supp Figure 1): ACTE Model, full sample at baseline, with GRM within family.
 i=4;
 fstem_imaging{i} = 'model4';
 titles{i} = 'ACTE Model, full sample, baseline, SNP-derived GRM';
@@ -73,21 +73,21 @@ RandomEffects{i} = {'A';'F';'T';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesex.txt'); 
 
-%% Model 5: ACTE Model, full sample at baseline and year 2, with GRM within family. 
+%% Model 5 (Figure 4): ACE Model, full sample at baseline and year 2, with GRM within family. 
 % Note that all longitudinal analyses should include data that is preresidualized for age, sex, site, and practice effect.
 i=5;
 fstem_imaging{i} = 'model5';
-titles{i} = 'ACTE Model, full sample, baseline and Y2, SNP-derived GRM';
-RandomEffects{i} = {'A';'F';'T';'E'};
+titles{i} = 'ACE Model, full sample, baseline and Y2, SNP-derived GRM';
+RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexprac.txt');   
 
-%% Model 6: ACTSE Model, full sample at baseline and year 2, with GRM within family. 
+%% Model 6 (Figure 4): ACSE Model, full sample at baseline and year 2, with GRM within family. 
 % Note that all longitudinal analyses should include data that is preresidualized for age, sex, site, and practice effect.
 i=6;
 fstem_imaging{i} = 'model6';
-titles{i} = 'ACTSE Model, full sample, baseline and Y2, SNP-derived GRM';
-RandomEffects{i} = {'A';'F';'T';'S';'E'};
+titles{i} = 'ACSE Model, full sample, baseline and Y2, SNP-derived GRM';
+RandomEffects{i} = {'A';'F';'S';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexprac.txt');   
 
@@ -109,8 +109,8 @@ dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesex.txt');
 
 i=9;
 fstem_imaging{i} = 's1_assigngrm_m5';
-titles{i} = 'ACTSE Model, full sample, baseline and Y2, kinship-derived GRM';
-RandomEffects{i} = {'A';'F';'T';'S';'E'};
+titles{i} = 'ACSE Model, full sample, baseline and Y2, kinship-derived GRM';
+RandomEffects{i} = {'A';'F';'S';'E'};
 fname_pihat{i} = assigned_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexprac.txt'); 
 
@@ -138,17 +138,19 @@ RandomEffects{i} = {'A';'F';'E'};
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','baseline_full_res_agesexsiteeducincpcs.txt');
 
-i=13;
-fstem_imaging{i} = 's2_allcovs_m4';
-titles{i} = 'ACTE Model, full sample, baseline, SNP-derived GRM, all covariates';
-RandomEffects{i} = {'A';'F';'T';'E'}; 
-fname_pihat{i} = measured_grm_file;
-dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
+if 0 % skipping because this model does not have usable confidence intervals for T
+  i=13;
+  fstem_imaging{i} = 's2_allcovs_m4';
+  titles{i} = 'ACTE Model, full sample, baseline, SNP-derived GRM, all covariates';
+  RandomEffects{i} = {'A';'F';'T';'E'}; 
+  fname_pihat{i} = measured_grm_file;
+  dirname_imaging{i} = strcat(pheno_dir,'/','baseline_twins_res_agesexsiteeducincpcs.txt');
+end
 
 i=14;
 fstem_imaging{i} = 's2_allcovs_m5';
-titles{i} = 'ACTSE Model, full sample, baseline and Y2, SNP-derived GRM, all covariates';
-RandomEffects{i} = {'A';'F';'T';'S';'E'}; 
+titles{i} = 'ACSE Model, full sample, baseline and Y2, SNP-derived GRM, all covariates';
+RandomEffects{i} = {'A';'F';'S';'E'}; 
 fname_pihat{i} = measured_grm_file;
 dirname_imaging{i} = strcat(pheno_dir,'/','longitudinal_full_res_agesexsitepraceducincpcs.txt');
 
