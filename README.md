@@ -1,7 +1,5 @@
 # Heritability estimation of cognitive phenotypes in the ABCD Study using mixed models
-Diana M. Smith, Rob Loughnan, Naomi Friedman, Wes Thompson, Ole Andreassen, Michael Neale, Terry L. Jernigan, Anders M. Dale.
-
-(Under Review.)
+Smith DM, Loughnan R, Friedman NP, Parekh P, Frei O, Thompson WK, Andreassen OA, Neale M, Jernigan TL, Dale AM. Heritability Estimation of Cognitive Phenotypes in the ABCD Study® Using Mixed Models. Behav Genet. 2023 May;53(3):169-188. doi: 10.1007/s10519-023-10141-2. Epub 2023 Apr 7. PMID: 37024669; PMCID: PMC10154273.
 
 This repository contains the code used to run all analyses in the manuscript. A description of each file is below, listed in the recommended order for running the code.
 
